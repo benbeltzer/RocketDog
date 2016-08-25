@@ -11,13 +11,17 @@ import SpriteKit
 class GameScene: SKScene {
     
     // Layers
-    var backgroundNode: SKNode!
-    var midgroundNode: SKNode!
-    var foregroundNode: SKNode!
-    var hudNode: SKNode!
+    var background: SKNode!
+    var midground: SKNode!
+    var foreground: SKNode!
+    var hud: SKNode!
+    
+    var player: SKNode!
     
     // For iPhone 6
     var scaleFactor: CGFloat!
+    
+    let tapToStartNode = SKSpriteNode(imageNamed: "TapToStart")
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -27,16 +31,39 @@ class GameScene: SKScene {
         super.init(size: size)
         backgroundColor = SKColor.whiteColor()
         
+        // No gravity
+        physicsWorld.gravity = CGVector(dx: 0.0, dy: 0.0)
+        
         scaleFactor = self.size.width / 320.0
         
-        // Set up background
-        backgroundNode = createBackgroundNode()
-        addChild(backgroundNode)
+        // Setup Background
+        background = createbackground()
+        addChild(background)
+        
+        // Setup Foreground
+        foreground = SKNode()
+        foreground.zPosition = 1
+        addChild(foreground)
+        
+        // HUD
+        hud = SKNode()
+        addChild(hud)
+        
+        // Player
+        player = createPlayer()
+        foreground.addChild(player)
+        
+        // Tap to Start
+        // TODO: Change this image to something else
+        tapToStartNode.position = CGPoint(x: self.size.width / 2, y: 200.0)
+        tapToStartNode.zPosition = player.zPosition + 1
+        hud.addChild(tapToStartNode)
     }
     
-    func createBackgroundNode() -> SKNode {
+    func createbackground() -> SKNode {
         
-        let backgroundNode = SKNode()
+        let background = SKNode()
+        background.zPosition = 0
         let ySpacing = 64.0 * scaleFactor // image dimension in pixels
         
         for i in 0...19 {
@@ -44,9 +71,46 @@ class GameScene: SKScene {
             node.setScale(scaleFactor)
             node.anchorPoint = CGPoint(x: 0.5, y: 0.0)
             node.position = CGPoint(x: self.size.width / 2, y: ySpacing * CGFloat(19-i))
-            backgroundNode.addChild(node)
+            background.addChild(node)
         }
         
-        return backgroundNode
+        return background
+    }
+    
+    func createPlayer() -> SKNode {
+        
+        let playerNode = SKNode()
+        playerNode.position = CGPoint(x: self.size.width / 2, y: 80.0) // TODO: Change magic number
+        
+        let sprite = SKSpriteNode(imageNamed: "blueRocket")
+        playerNode.addChild(sprite)
+        
+        playerNode.physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
+        playerNode.physicsBody?.dynamic = false
+        playerNode.physicsBody?.allowsRotation = false // TODO: May want to change this later
+
+        // Node interaction properties
+        // TODO: May want to change damping later
+        playerNode.physicsBody?.restitution = 1.0
+        playerNode.physicsBody?.linearDamping = 0.0
+        playerNode.physicsBody?.angularDamping = 0.0
+        playerNode.physicsBody?.friction = 0.0
+        
+        return playerNode
+    }
+    
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+
+        // If already started ignore touches
+        // TODO: Change this when power ups incorporated
+        if player.physicsBody!.dynamic {
+            return
+        }
+        
+        tapToStartNode.removeFromParent()
+        
+        player.physicsBody?.dynamic = true
+        // TODO: Remove this impulse
+        player.physicsBody?.applyImpulse(CGVector(dx: 0.0, dy: 20.0))
     }
 }
