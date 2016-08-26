@@ -51,9 +51,10 @@ class GameScene: SKScene {
         hud = SKNode()
         addChild(hud)
         
-        // Add an asteroid
-        let asteroid = createAsteroidAtPosition(CGPoint(x: 160, y: 250))
-        foreground.addChild(asteroid)
+        // Load level
+        let levelPlist = NSBundle.mainBundle().pathForResource("Level01", ofType: "plist")
+        let levelData = NSDictionary(contentsOfFile: levelPlist!)!
+        drawAsteroids(levelData)
         
         // Player
         player = createPlayer()
@@ -85,7 +86,7 @@ class GameScene: SKScene {
     
     func createPlayer() -> GameObjectNode {
         
-        let playerNode = GameObjectNode() //SKNode()
+        let playerNode = GameObjectNode()
         playerNode.position = CGPoint(x: self.size.width / 2, y: 80.0) // TODO: Change magic number
         
         let sprite = SKSpriteNode(imageNamed: "blueRocket")
@@ -128,16 +129,22 @@ class GameScene: SKScene {
     
     // For creating stationary asteroids
     // TODO: Create seperate method for creating asteroid at position with force (vector)
-    func createAsteroidAtPosition(position: CGPoint) -> AsteroidNode {
+    func createAsteroidAtPosition(position: CGPoint, ofType type: AsteroidType) -> AsteroidNode {
         
         let node = AsteroidNode()
         node.position = CGPoint(x: position.x * scaleFactor, y: position.y)
         node.name = "ASTEROID_NODE"
         
-        let sprite = SKSpriteNode(imageNamed: "asteroid")
+        node.type = type
+        var sprite: SKSpriteNode!
+        if type == .Moving {
+            sprite = SKSpriteNode(imageNamed: "asteroidWithTrail")
+        } else {
+            sprite = SKSpriteNode(imageNamed: "asteroid")
+        }
         node.addChild(sprite)
         
-        node.physicsBody = SKPhysicsBody(circleOfRadius: sprite.size.width / 2)
+        node.physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
         node.physicsBody?.dynamic = false
         
         node.physicsBody?.categoryBitMask = CollisionCategoryBitMask.Asteroid
@@ -145,6 +152,31 @@ class GameScene: SKScene {
         
         return node
     }
+    
+    func drawAsteroids(levelData: NSDictionary) {
+        let asteroids = levelData["Asteroids"] as! NSDictionary
+        let asteroidPatterns = asteroids["Patterns"] as! NSDictionary
+        let asteroidPositions = asteroids["Positions"] as! [NSDictionary]
+        
+        for asteroidPosition in asteroidPositions {
+            let patternX = asteroidPosition["x"]?.floatValue
+            let patternY = asteroidPosition["y"]?.floatValue
+            let pattern = asteroidPosition["pattern"] as! NSString
+            
+            let asteroidPattern = asteroidPatterns[pattern] as! [NSDictionary]
+            for asteroidPoint in asteroidPattern {
+                let x = asteroidPoint["x"]?.floatValue
+                let y = asteroidPoint["y"]?.floatValue
+                let positionX = CGFloat(x! + patternX!)
+                let positionY = CGFloat(y! + patternY!)
+                
+                // TODO: For now, all asteroids will be type normal
+                let asteroidNode = createAsteroidAtPosition(CGPoint(x: positionX, y: positionY), ofType: .Normal)
+                foreground.addChild(asteroidNode)
+            }
+        }
+    }
+    
 }
 
 extension GameScene: SKPhysicsContactDelegate {

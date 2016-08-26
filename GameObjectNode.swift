@@ -14,6 +14,11 @@ struct CollisionCategoryBitMask {
     static let Asteroid: UInt32 = 0x01
 }
 
+enum AsteroidType: Int {
+    case Normal = 0
+    case Moving
+}
+
 class GameObjectNode: SKNode {
 
     func collisionWithPlayer(player: SKNode) -> Bool {
@@ -30,7 +35,7 @@ class GameObjectNode: SKNode {
         
         let gameScene = self.scene! as! GameScene
         
-        let explosionSound = SKAction.playSoundFileNamed("explosion.wav", waitForCompletion: false)
+        let explosionSound = SKAction.playSoundFileNamed("explosion.wav", waitForCompletion: true)
         gameScene.runAction(explosionSound)
         
         // Pulsate Background
@@ -89,6 +94,8 @@ class GameObjectNode: SKNode {
 }
 
 class AsteroidNode: GameObjectNode {
+    
+    var type: AsteroidType!
     
     // TODO: Explode ship and Asteroid
     override func collisionWithPlayer(player: SKNode) -> Bool {
