@@ -29,7 +29,9 @@ class GameScene: SKScene {
     
     override init(size: CGSize) {
         super.init(size: size)
-        backgroundColor = SKColor.whiteColor()
+        backgroundColor = SKColor.blackColor()
+
+        physicsWorld.contactDelegate = self
         
         // No gravity
         physicsWorld.gravity = CGVector(dx: 0.0, dy: 0.0)
@@ -48,6 +50,10 @@ class GameScene: SKScene {
         // HUD
         hud = SKNode()
         addChild(hud)
+        
+        // Add an asteroid
+        let asteroid = createAsteroidAtPosition(CGPoint(x: 160, y: 250))
+        foreground.addChild(asteroid)
         
         // Player
         player = createPlayer()
@@ -77,9 +83,9 @@ class GameScene: SKScene {
         return background
     }
     
-    func createPlayer() -> SKNode {
+    func createPlayer() -> GameObjectNode {
         
-        let playerNode = SKNode()
+        let playerNode = GameObjectNode() //SKNode()
         playerNode.position = CGPoint(x: self.size.width / 2, y: 80.0) // TODO: Change magic number
         
         let sprite = SKSpriteNode(imageNamed: "blueRocket")
@@ -95,6 +101,12 @@ class GameScene: SKScene {
         playerNode.physicsBody?.linearDamping = 0.0
         playerNode.physicsBody?.angularDamping = 0.0
         playerNode.physicsBody?.friction = 0.0
+        
+        // Physics Body Setup
+        playerNode.physicsBody?.usesPreciseCollisionDetection = true
+        playerNode.physicsBody?.categoryBitMask = CollisionCategoryBitMask.Player
+        playerNode.physicsBody?.collisionBitMask = 0 // Dont let physics engine handle player collisions
+        playerNode.physicsBody?.contactTestBitMask = CollisionCategoryBitMask.Asteroid
         
         return playerNode
     }
@@ -113,4 +125,50 @@ class GameScene: SKScene {
         // TODO: Remove this impulse
         player.physicsBody?.applyImpulse(CGVector(dx: 0.0, dy: 20.0))
     }
+    
+    // For creating stationary asteroids
+    // TODO: Create seperate method for creating asteroid at position with force (vector)
+    func createAsteroidAtPosition(position: CGPoint) -> AsteroidNode {
+        
+        let node = AsteroidNode()
+        node.position = CGPoint(x: position.x * scaleFactor, y: position.y)
+        node.name = "ASTEROID_NODE"
+        
+        let sprite = SKSpriteNode(imageNamed: "asteroid")
+        node.addChild(sprite)
+        
+        node.physicsBody = SKPhysicsBody(circleOfRadius: sprite.size.width / 2)
+        node.physicsBody?.dynamic = false
+        
+        node.physicsBody?.categoryBitMask = CollisionCategoryBitMask.Asteroid
+        node.physicsBody?.collisionBitMask = 0
+        
+        return node
+    }
 }
+
+extension GameScene: SKPhysicsContactDelegate {
+    
+    func didBeginContact(contact: SKPhysicsContact) {
+        var updateHUD = false
+        
+        let nonPlayerNode = (contact.bodyA.node != player) ? contact.bodyA.node : contact.bodyB.node
+        let other = nonPlayerNode as! GameObjectNode
+        
+        updateHUD = other.collisionWithPlayer(player)
+        
+        // Update the HUD if necessary
+        if updateHUD {
+            // TODO: Update HUD
+        }
+    }
+    
+}
+
+
+
+
+
+
+
+
