@@ -30,8 +30,8 @@ class GameObjectNode: SKNode {
         
         let gameScene = self.scene! as! GameScene
         
-        //  let explosionSound = SKAction.playSoundFileNamed("explosion.wav", waitForCompletion: true)
-        //  gameScene.runAction(explosionSound)
+        let explosionSound = SKAction.playSoundFileNamed("explosion.wav", waitForCompletion: false)
+        gameScene.runAction(explosionSound)
         
         // Pulsate Background
         let background = gameScene.background
