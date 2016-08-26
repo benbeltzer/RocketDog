@@ -23,6 +23,16 @@ class GameScene: SKScene {
     
     let tapToStartNode = SKSpriteNode(imageNamed: "TapToStart")
     
+    let planets = [
+        "moon",
+        "mars",
+        "jupiter",
+        "saturn",
+        "uranus",
+        "neptune",
+        "pluto"
+    ]
+    
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
@@ -42,13 +52,19 @@ class GameScene: SKScene {
         background = createbackground()
         addChild(background)
         
+        // Setup Midground
+        midground = createMidground()
+        addChild(midground)
+        
         // Setup Foreground
         foreground = SKNode()
+        foreground.name = "FOREGROUND"
         foreground.zPosition = 1
         addChild(foreground)
         
         // HUD
         hud = SKNode()
+        hud.name = "HUD"
         addChild(hud)
         
         // Load level
@@ -58,10 +74,12 @@ class GameScene: SKScene {
         
         // Player
         player = createPlayer()
+        player.name = "PLAYER"
         foreground.addChild(player)
         
         // Tap to Start
         // TODO: Change this image to something else
+        tapToStartNode.name = "TAPTOSTART"
         tapToStartNode.position = CGPoint(x: self.size.width / 2, y: 200.0)
         tapToStartNode.zPosition = player.zPosition + 1
         hud.addChild(tapToStartNode)
@@ -80,8 +98,37 @@ class GameScene: SKScene {
             node.position = CGPoint(x: self.size.width / 2, y: ySpacing * CGFloat(19-i))
             background.addChild(node)
         }
-        
+        background.name = "BACKGROUND"
         return background
+    }
+    
+    func createMidground() -> SKNode {
+        
+        let midgroundNode = SKNode()
+        var anchor: CGPoint!
+        var xPosition: CGFloat!
+        
+        // Draw Planets
+        for index in 0...(planets.count - 1) {
+            
+            let r = arc4random() % 2
+            if r > 0 {
+                // Right side
+                anchor = CGPoint(x: 0.9, y: 0.5)
+                xPosition = self.size.width
+            } else {
+                // Left side
+                anchor = CGPoint(x: -0.1, y: 0.5)
+                xPosition = 0.0
+            }
+         
+            let planetNode = SKSpriteNode(imageNamed: planets[index])
+            planetNode.anchorPoint = anchor
+            planetNode.position = CGPoint(x: xPosition, y: 1000.0 * CGFloat(index + 1))
+            midgroundNode.addChild(planetNode)
+        }
+        midgroundNode.name = "MIDGROUND"
+        return midgroundNode
     }
     
     func createPlayer() -> GameObjectNode {
@@ -172,6 +219,7 @@ class GameScene: SKScene {
                 
                 // TODO: For now, all asteroids will be type normal
                 let asteroidNode = createAsteroidAtPosition(CGPoint(x: positionX, y: positionY), ofType: .Normal)
+                asteroidNode.name = "NORMAL_ASTEROID"
                 foreground.addChild(asteroidNode)
             }
         }

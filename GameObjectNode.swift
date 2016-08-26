@@ -21,6 +21,8 @@ enum AsteroidType: Int {
 
 class GameObjectNode: SKNode {
 
+    let explosionSound = SKAction.playSoundFileNamed("explosion.wav", waitForCompletion: true)
+    
     func collisionWithPlayer(player: SKNode) -> Bool {
         return false
     }
@@ -34,8 +36,6 @@ class GameObjectNode: SKNode {
     func addExplosionToObject() {
         
         let gameScene = self.scene! as! GameScene
-        
-        let explosionSound = SKAction.playSoundFileNamed("explosion.wav", waitForCompletion: true)
         gameScene.runAction(explosionSound)
         
         // Pulsate Background
@@ -45,22 +45,18 @@ class GameObjectNode: SKNode {
         })
         
         // Shake the scene
-        let moveX1 = SKAction.moveBy(CGVectorMake(-7, 0), duration: 0.05)
-        let moveX2 = SKAction.moveBy(CGVectorMake(10, 0), duration: 0.05)
-        let moveX3 = SKAction.moveBy(CGVectorMake(-10, 0), duration: 0.05)
-        let moveX4 = SKAction.moveBy(CGVectorMake(7, 0), duration: 0.05)
+        let move1 = SKAction.moveBy(CGVectorMake(-7, -7), duration: 0.1)
+        let move2 = SKAction.moveBy(CGVectorMake(0, 10), duration: 0.1)
+        let move3 = SKAction.moveBy(CGVectorMake(7, -10), duration: 0.1)
+        let move4 = SKAction.moveBy(CGVectorMake(0, 7), duration: 0.1)
+        let move5 = SKAction.moveBy(CGVectorMake(0, 10), duration: 0.15)
+        let move6 = SKAction.moveBy(CGVectorMake(7, -10), duration: 0.2)
+        let move7 = SKAction.moveBy(CGVectorMake(0, 7), duration: 0.25)
         
-        let moveY1 = SKAction.moveBy(CGVectorMake(0, -7), duration: 0.05)
-        let moveY2 = SKAction.moveBy(CGVectorMake(0, 10), duration: 0.05)
-        let moveY3 = SKAction.moveBy(CGVectorMake(0, -10), duration: 0.05)
-        let moveY4 = SKAction.moveBy(CGVectorMake(0, 7), duration: 0.05)
-        
-        let shakeX = SKAction.sequence([moveX1, moveX2, moveX3, moveX4])
-        let shakeY = SKAction.sequence([moveY1, moveY2, moveY3, moveY4])
+        let shake = SKAction.sequence([move1, move2, move3, move4, move1, move5, move6, move7])
         
         for child in gameScene.children {
-            child.runAction(shakeX)
-            child.runAction(shakeY)
+            shakeNode(child, shake: shake)
         }
         
         let fireEmitterPath = NSBundle.mainBundle().pathForResource("fire", ofType: "sks")
@@ -89,6 +85,16 @@ class GameObjectNode: SKNode {
                 smokeEmitter.particleBirthRate = 0
             })
         ]))
+    }
+    
+    func shakeNode(node: SKNode, shake: SKAction) {
+        if (node.children.count == 0) {
+            return
+        } else {
+            for child in node.children {
+                child.runAction(shake)
+            }
+        }
     }
     
 }
