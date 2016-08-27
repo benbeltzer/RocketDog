@@ -21,6 +21,7 @@ class GameScene: SKScene {
     
     let motionManager = CMMotionManager()
     var xAcceleration: CGFloat = 0.0 // value from accelerometer
+    var rotation: CGFloat = 0.0
     
     // For iPhone 6
     var scaleFactor: CGFloat!
@@ -206,13 +207,22 @@ class GameScene: SKScene {
 
     func initMotionManager() {
         
-        motionManager.accelerometerUpdateInterval = 0.2
+        // Get xAcceleration
         
+        motionManager.accelerometerUpdateInterval = 0.1
         motionManager.startAccelerometerUpdatesToQueue(NSOperationQueue.currentQueue()!, withHandler: {
             (accelerometerData: CMAccelerometerData?, error: NSError?) in
-            
             let acceleration = accelerometerData!.acceleration
             self.xAcceleration = (CGFloat(acceleration.x) * 0.75) + (self.xAcceleration * 0.25)
+        })
+        
+        // Get rotation
+        motionManager.deviceMotionUpdateInterval = 0.02
+        motionManager.startDeviceMotionUpdatesToQueue(NSOperationQueue.currentQueue()!, withHandler: {
+            (motion: CMDeviceMotion?, error: NSError?) in
+            if let gravity = motion?.gravity {
+                self.rotation = CGFloat(atan2(gravity.x, gravity.y) - M_PI)
+            }
         })
     }
     
@@ -281,9 +291,8 @@ class GameScene: SKScene {
     }
     
     override func didSimulatePhysics() {
-        
-        // TODO: consider changing
-        player.physicsBody?.velocity = CGVector(dx: xAcceleration * 400.0, dy: player.physicsBody!.velocity.dy)
+        player.physicsBody?.velocity.dx = xAcceleration * 400.0
+        player.zRotation = self.rotation
         
         // Check x bounds for wrap around
         if player.position.x < -20.0 {
@@ -295,6 +304,9 @@ class GameScene: SKScene {
     
     func endGame() {
 
+        motionManager.stopDeviceMotionUpdates()
+        motionManager.stopAccelerometerUpdates()
+        
         gameOver = true
         GameState.sharedInstance.saveState()
         
