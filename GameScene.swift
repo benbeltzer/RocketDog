@@ -7,6 +7,7 @@
 //
 
 import SpriteKit
+import CoreMotion
 
 class GameScene: SKScene {
     
@@ -18,20 +19,17 @@ class GameScene: SKScene {
     
     var player: SKNode!
     
+    let motionManager = CMMotionManager()
+    var xAcceleration: CGFloat = 0.0 // value from accelerometer
+    
     // For iPhone 6
     var scaleFactor: CGFloat!
     
     let tapToStartNode = SKSpriteNode(imageNamed: "TapToStart")
     
-    let planets = [
-        "moon",
-        "mars",
-        "jupiter",
-        "saturn",
-        "uranus",
-        "neptune",
-        "pluto"
-    ]
+    var scoreLabel: SKLabelNode!
+    
+    var gameOver = false
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -48,23 +46,29 @@ class GameScene: SKScene {
         
         scaleFactor = self.size.width / 320.0
         
+        GameState.sharedInstance.score = 0
+        gameOver = false
+        
         // Setup Background
         background = createbackground()
+        background.zPosition = 0
         addChild(background)
         
         // Setup Midground
         midground = createMidground()
+        midground.zPosition = 1
         addChild(midground)
         
         // Setup Foreground
         foreground = SKNode()
         foreground.name = "FOREGROUND"
-        foreground.zPosition = 1
+        foreground.zPosition = 2
         addChild(foreground)
         
         // HUD
         hud = SKNode()
         hud.name = "HUD"
+        hud.zPosition = 3
         addChild(hud)
         
         // Load level
@@ -78,17 +82,44 @@ class GameScene: SKScene {
         foreground.addChild(player)
         
         // Tap to Start
-        // TODO: Change this image to something else
+        // TODO: Change this image to something else, like Blast Off!
         tapToStartNode.name = "TAPTOSTART"
         tapToStartNode.position = CGPoint(x: self.size.width / 2, y: 200.0)
         tapToStartNode.zPosition = player.zPosition + 1
         hud.addChild(tapToStartNode)
+        
+        buildHUD()
+        
+        initMotionManager()
+    }
+    
+    override func update(currentTime: NSTimeInterval) {
+        
+        if gameOver {
+            return
+        }
+        
+        GameState.sharedInstance.score = Int(player.position.y) - 79
+        scoreLabel.text = "\(GameState.sharedInstance.score)"
+        
+        // Remove past objected
+        foreground.enumerateChildNodesWithName("ASTEROID_NODE", usingBlock: {
+            (node, stop) in
+            let asteroid = node as! AsteroidNode
+            asteroid.checkNodeRemoval(self.player.position.y)
+        })
+        
+        if (player.physicsBody!.dynamic) {
+            background.position.y -= 0.2
+            midground.position.y -=  0.5
+            foreground.position.y -= 2
+            player.position.y += 2
+        }
     }
     
     func createbackground() -> SKNode {
         
         let background = SKNode()
-        background.zPosition = 0
         let ySpacing = 64.0 * scaleFactor // image dimension in pixels
         
         for i in 0...19 {
@@ -109,17 +140,18 @@ class GameScene: SKScene {
         var xPosition: CGFloat!
         
         // Draw Planets
+        let planets = ["moon", "mars", "jupiter", "saturn", "uranus", "neptune", "pluto"]
+        
         for index in 0...(planets.count - 1) {
-            
             let r = arc4random() % 2
             if r > 0 {
                 // Right side
-                anchor = CGPoint(x: 0.9, y: 0.5)
-                xPosition = self.size.width
+                anchor = CGPoint(x: 1.0, y: 0.5)
+                xPosition = self.size.width + 25.0
             } else {
                 // Left side
-                anchor = CGPoint(x: -0.1, y: 0.5)
-                xPosition = 0.0
+                anchor = CGPoint(x: 0.0, y: 0.5)
+                xPosition = -25.0
             }
          
             let planetNode = SKSpriteNode(imageNamed: planets[index])
@@ -159,19 +191,29 @@ class GameScene: SKScene {
         return playerNode
     }
     
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    func buildHUD() {
 
-        // If already started ignore touches
-        // TODO: Change this when power ups incorporated
-        if player.physicsBody!.dynamic {
-            return
-        }
+        // TODO: Change this dumb font
+        scoreLabel = SKLabelNode(fontNamed: "ChalkboardSE-Bold")
+        scoreLabel.fontSize = 30
+        scoreLabel.fontColor = SKColor.whiteColor()
+        scoreLabel.position = CGPoint(x: self.size.width-20, y: self.size.height-40)
+        scoreLabel.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.Right
         
-        tapToStartNode.removeFromParent()
+        scoreLabel.text = "0"
+        hud.addChild(scoreLabel)
+    }
+
+    func initMotionManager() {
         
-        player.physicsBody?.dynamic = true
-        // TODO: Remove this impulse
-        player.physicsBody?.applyImpulse(CGVector(dx: 0.0, dy: 20.0))
+        motionManager.accelerometerUpdateInterval = 0.2
+        
+        motionManager.startAccelerometerUpdatesToQueue(NSOperationQueue.currentQueue()!, withHandler: {
+            (accelerometerData: CMAccelerometerData?, error: NSError?) in
+            
+            let acceleration = accelerometerData!.acceleration
+            self.xAcceleration = (CGFloat(acceleration.x) * 0.75) + (self.xAcceleration * 0.25)
+        })
     }
     
     // For creating stationary asteroids
@@ -225,6 +267,41 @@ class GameScene: SKScene {
         }
     }
     
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        
+        // If already started ignore touches
+        // TODO: Change this when power ups incorporated
+        if player.physicsBody!.dynamic {
+            return
+        }
+        
+        tapToStartNode.removeFromParent()
+        
+        player.physicsBody?.dynamic = true
+    }
+    
+    override func didSimulatePhysics() {
+        
+        // TODO: consider changing
+        player.physicsBody?.velocity = CGVector(dx: xAcceleration * 400.0, dy: player.physicsBody!.velocity.dy)
+        
+        // Check x bounds for wrap around
+        if player.position.x < -20.0 {
+            player.position.x = self.size.width + 20.0
+        } else if (player.position.x > self.size.width + 20.0) {
+            player.position.x = -20.0
+        }
+    }
+    
+    func endGame() {
+
+        gameOver = true
+        GameState.sharedInstance.saveState()
+        
+        let reveal = SKTransition.fadeWithDuration(0.5)
+        let endGameScene = EndGameScene(size: self.size)
+        self.view!.presentScene(endGameScene, transition: reveal)
+    }
 }
 
 extension GameScene: SKPhysicsContactDelegate {
@@ -239,7 +316,7 @@ extension GameScene: SKPhysicsContactDelegate {
         
         // Update the HUD if necessary
         if updateHUD {
-            // TODO: Update HUD
+            scoreLabel.text = "\(GameState.sharedInstance.score)"
         }
     }
     

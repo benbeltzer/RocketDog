@@ -35,7 +35,10 @@ class GameObjectNode: SKNode {
     
     func addExplosionToObject() {
         
-        let gameScene = self.scene! as! GameScene
+        guard let gameScene = self.scene as? GameScene else {
+            return
+        }
+        
         gameScene.runAction(explosionSound)
         
         // Pulsate Background
@@ -63,7 +66,7 @@ class GameObjectNode: SKNode {
         let fireEmitter = NSKeyedUnarchiver.unarchiveObjectWithFile(fireEmitterPath!) as! SKEmitterNode
         fireEmitter.position = position
         fireEmitter.zPosition = 2
-        gameScene.addChild(fireEmitter)
+        self.parent!.addChild(fireEmitter)
         
         fireEmitter.runAction(SKAction.sequence([
             SKAction.waitForDuration(0.3),
@@ -76,13 +79,14 @@ class GameObjectNode: SKNode {
         let smokeEmitter = NSKeyedUnarchiver.unarchiveObjectWithFile(smokeEmitterPath!) as! SKEmitterNode
         smokeEmitter.position = position
         smokeEmitter.zPosition = 2
-        gameScene.addChild(smokeEmitter)
+        self.parent!.addChild(smokeEmitter)
         
         smokeEmitter.runAction(SKAction.sequence([
             SKAction.waitForDuration(0.1),
             SKAction.scaleBy(1.2, duration: 0.1),
             SKAction.runBlock({
                 smokeEmitter.particleBirthRate = 0
+                gameScene.endGame()
             })
         ]))
     }
@@ -103,16 +107,17 @@ class AsteroidNode: GameObjectNode {
     
     var type: AsteroidType!
     
-    // TODO: Explode ship and Asteroid
     override func collisionWithPlayer(player: SKNode) -> Bool {
 
+        // TODO: Fix background so that no black is visible when screen shakes
         (player as! GameObjectNode).addExplosionToObject()
         self.addExplosionToObject()
+        
         player.removeFromParent()
         self.removeFromParent()
         
-        // HUD needs updated
-        return true
+        // No need to update HUD
+        return false
     }
     
 }
