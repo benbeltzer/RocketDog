@@ -23,6 +23,9 @@ class GameScene: SKScene {
     var xAcceleration: CGFloat = 0.0 // value from accelerometer
     var rotation: CGFloat = 0.0
     
+    // music
+    var backgroundMusic: SKAudioNode!
+    
     // For iPhone 6
     var scaleFactor: CGFloat!
     
@@ -73,7 +76,7 @@ class GameScene: SKScene {
         addChild(hud)
         
         // Load level
-        let levelPlist = NSBundle.mainBundle().pathForResource("Level01", ofType: "plist")
+        let levelPlist = NSBundle.mainBundle().pathForResource("Level_Singles", ofType: "plist")
         let levelData = NSDictionary(contentsOfFile: levelPlist!)!
         drawAsteroids(levelData)
         
@@ -252,29 +255,53 @@ class GameScene: SKScene {
         return node
     }
     
+    // Draw pattern at location and return max y height
+    func drawPattern(pattern: [NSDictionary], patternX: CGFloat, patternY: CGFloat) -> CGFloat {
+        var maxY: CGFloat = 0
+        for asteroidPoint in pattern {
+            let x = asteroidPoint["x"]?.floatValue
+            let y = asteroidPoint["y"]?.floatValue
+            let positionX = CGFloat(x!) + patternX
+            let positionY = CGFloat(y!) + patternY
+            
+            // TODO: For now, all asteroids will be type normal
+            let asteroidNode = createAsteroidAtPosition(CGPoint(x: positionX, y: positionY), ofType: .Normal)
+            asteroidNode.name = "NORMAL_ASTEROID"
+            foreground.addChild(asteroidNode)
+            maxY = (positionY > maxY) ? positionY : maxY
+        }
+        
+        return maxY
+    }
+    
+    func generateAsteroidPositions(patterns: NSDictionary) {
+        var currentY: CGFloat = 300
+        let maxY: CGFloat = 5000
+        
+        let numPatterns = patterns.count
+        var pattern: [NSDictionary]!
+        var xPosition: CGFloat!
+        var nextY: CGFloat!
+        var r = 0
+        
+        while (currentY < maxY) {
+            // Get random pattern
+            r = random()
+            pattern = patterns.allValues[r % numPatterns] as! [NSDictionary]
+            
+            // Get rancdom xPosition between 20 and self.size.width - 20
+            xPosition = (CGFloat(r) % (self.size.width - 40)) + 20
+            
+            nextY = drawPattern(pattern, patternX: xPosition, patternY: currentY)
+            currentY = nextY + 100
+        }
+        
+    }
+    
     func drawAsteroids(levelData: NSDictionary) {
         let asteroids = levelData["Asteroids"] as! NSDictionary
         let asteroidPatterns = asteroids["Patterns"] as! NSDictionary
-        let asteroidPositions = asteroids["Positions"] as! [NSDictionary]
-        
-        for asteroidPosition in asteroidPositions {
-            let patternX = asteroidPosition["x"]?.floatValue
-            let patternY = asteroidPosition["y"]?.floatValue
-            let pattern = asteroidPosition["pattern"] as! NSString
-            
-            let asteroidPattern = asteroidPatterns[pattern] as! [NSDictionary]
-            for asteroidPoint in asteroidPattern {
-                let x = asteroidPoint["x"]?.floatValue
-                let y = asteroidPoint["y"]?.floatValue
-                let positionX = CGFloat(x! + patternX!)
-                let positionY = CGFloat(y! + patternY!)
-                
-                // TODO: For now, all asteroids will be type normal
-                let asteroidNode = createAsteroidAtPosition(CGPoint(x: positionX, y: positionY), ofType: .Normal)
-                asteroidNode.name = "NORMAL_ASTEROID"
-                foreground.addChild(asteroidNode)
-            }
-        }
+        generateAsteroidPositions(asteroidPatterns)
     }
     
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
@@ -286,6 +313,11 @@ class GameScene: SKScene {
         }
         
         tapToStartNode.removeFromParent()
+
+        if let musicURL = NSBundle.mainBundle().URLForResource("rocket_thrust", withExtension: "wav") {
+            backgroundMusic = SKAudioNode(URL: musicURL)
+            addChild(backgroundMusic)
+        }
         
         player.physicsBody?.dynamic = true
     }
