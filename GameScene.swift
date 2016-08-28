@@ -100,7 +100,7 @@ class GameScene: SKScene {
         tapToStartNode.zPosition = player.zPosition + 1
         hud.addChild(tapToStartNode)
         
-        buildHUD()
+        createHUD()
         
         initMotionManager()
     }
@@ -111,16 +111,18 @@ class GameScene: SKScene {
             return
         }
         
+        // Update Score
         GameState.sharedInstance.score = Int(player.position.y) - 79
         scoreLabel.text = "\(GameState.sharedInstance.score)"
         
-        // Remove past objected
+        // Remove past objects
         foreground.enumerateChildNodesWithName("ASTEROID_NODE", usingBlock: {
             (node, stop) in
             let asteroid = node as! AsteroidNode
             asteroid.checkNodeRemoval(self.player.position.y)
         })
         
+        // Paralax Effect
         if (player.physicsBody!.dynamic) {
             background.position.y -= 0.2
             midground.position.y -=  0.5
@@ -134,6 +136,13 @@ class GameScene: SKScene {
             drawAsteroids(startingAt: maxLevelY - 1000)
         }
         
+        // Check if we should add a flying asteroid
+        let r = random()
+        if (r % 100) == 0 {
+            print("Drawing Asteroid!!")
+             drawMovingAsteroid(r)
+        }
+        
         // Check if we need to reload background
         if (player.position.y > backgroundHeight - self.size.height - 50) {
             backgroundHeight = backgroundHeight + backgroundImageHeight
@@ -142,6 +151,38 @@ class GameScene: SKScene {
             background.addChild(newBackground)
         }
     }
+    
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        
+        // If already started ignore touches
+        // TODO: Change this when power ups incorporated
+        if player.physicsBody!.dynamic {
+            return
+        }
+        
+        tapToStartNode.removeFromParent()
+        
+        if let musicURL = NSBundle.mainBundle().URLForResource("rocket_thrust", withExtension: "wav") {
+            backgroundMusic = SKAudioNode(URL: musicURL)
+            addChild(backgroundMusic)
+        }
+        
+        player.physicsBody?.dynamic = true
+    }
+    
+    override func didSimulatePhysics() {
+        player.physicsBody?.velocity.dx = xAcceleration * 400.0
+        player.zRotation = self.rotation
+        
+        // Check x bounds for wrap around
+        if player.position.x < -20.0 {
+            player.position.x = self.size.width + 20.0
+        } else if (player.position.x > self.size.width + 20.0) {
+            player.position.x = -20.0
+        }
+    }
+    
+    // MARK: Node Creating
     
     func createBackground(offset: Int) -> SKNode {
         
@@ -195,17 +236,16 @@ class GameScene: SKScene {
     func createPlayer() -> GameObjectNode {
         
         let playerNode = GameObjectNode()
-        playerNode.position = CGPoint(x: self.size.width / 2, y: 80.0) // TODO: Change magic number
+        playerNode.position = CGPoint(x: self.size.width / 2, y: 80.0)
         
         let sprite = SKSpriteNode(imageNamed: "blueRocket")
         playerNode.addChild(sprite)
         
         playerNode.physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
         playerNode.physicsBody?.dynamic = false
-        playerNode.physicsBody?.allowsRotation = false // TODO: May want to change this later
+        playerNode.physicsBody?.allowsRotation = false
 
         // Node interaction properties
-        // TODO: May want to change damping later
         playerNode.physicsBody?.restitution = 1.0
         playerNode.physicsBody?.linearDamping = 0.0
         playerNode.physicsBody?.angularDamping = 0.0
@@ -220,7 +260,7 @@ class GameScene: SKScene {
         return playerNode
     }
     
-    func buildHUD() {
+    func createHUD() {
 
         // TODO: Change this dumb font
         scoreLabel = SKLabelNode(fontNamed: "ChalkboardSE-Bold")
@@ -232,11 +272,94 @@ class GameScene: SKScene {
         scoreLabel.text = "0"
         hud.addChild(scoreLabel)
     }
+    
+    // For creating stationary asteroids
+    // TODO: Create seperate method for creating asteroid at position with force (vector)
+    func drawAsteroidAtPosition(position: CGPoint, ofType type: AsteroidType) -> AsteroidNode {
+        
+        let node = AsteroidNode()
+        node.position = CGPoint(x: position.x * scaleFactor, y: position.y)
+        node.type = type
+        
+        var sprite: SKSpriteNode!
+        if type == .Moving {
+            sprite = SKSpriteNode(imageNamed: "asteroidWithTrail")
+            node.physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
+            node.physicsBody?.dynamic = true
+            node.name = "MOVING_ASTEROID"
+        } else {
+            sprite = SKSpriteNode(imageNamed: "asteroid")
+            node.physicsBody = SKPhysicsBody(circleOfRadius: sprite.size.width / 2)
+            node.physicsBody?.dynamic = false
+            node.name = "NORMAL_ASTEROID"
+        }
+        node.addChild(sprite)
+        
+        node.physicsBody?.categoryBitMask = CollisionCategoryBitMask.Asteroid
+        node.physicsBody?.collisionBitMask = 0
+        
+        return node
+    }
+    
+    // Draw pattern at location and return max y height
+    func drawPattern(pattern: [NSDictionary], patternX: CGFloat, patternY: CGFloat) -> CGFloat {
 
+        var maxY: CGFloat = 0
+        
+        for asteroidPoint in pattern {
+            let x = asteroidPoint["x"]?.floatValue
+            let y = asteroidPoint["y"]?.floatValue
+            let positionX = CGFloat(x!) + patternX
+            let positionY = CGFloat(y!) + patternY
+            
+            let asteroidNode = drawAsteroidAtPosition(CGPoint(x: positionX, y: positionY), ofType: .Normal)
+            foreground.addChild(asteroidNode)
+            maxY = (positionY > maxY) ? positionY : maxY
+        }
+        
+        return maxY
+    }
+    
+    func drawAsteroids(startingAt y: CGFloat) {
+        let patterns = (levelData["Asteroids"] as! NSDictionary)["Patterns"] as! NSDictionary
+        let numPatterns = patterns.count
+        var pattern: [NSDictionary]!
+        var currentY = y
+        var nextY: CGFloat!
+        var xPosition: CGFloat!
+        var r = 0
+        
+        while (currentY < maxLevelY) {
+            // Get random pattern
+            r = random()
+            pattern = patterns.allValues[r % numPatterns] as! [NSDictionary]
+            
+            // Get rancdom xPosition between 30 and self.size.width - 30
+            xPosition = (CGFloat(r) % (self.size.width - 60)) + 30
+            
+            nextY = drawPattern(pattern, patternX: xPosition, patternY: currentY)
+            currentY = nextY + 100
+        }
+    }
+    
+    func drawMovingAsteroid(randomValue: Int) {
+        let xPosition = CGFloat(randomValue) % self.size.width
+        let asteroid = drawAsteroidAtPosition(CGPoint(x: xPosition, y: player.position.y + self.size.height), ofType: .Moving)
+        foreground.addChild(asteroid)
+
+        // Get random dx between -5 and 5, random dy between -10 and 5        
+        let dx = (random() % 10) - 5
+        let dy = dx - 20
+
+        asteroid.zRotation = atan2(CGFloat(dy), CGFloat(dx)) + CGFloat(M_PI_2)
+        asteroid.physicsBody?.applyImpulse(CGVector(dx: dx, dy: dy))
+    }
+    
+    // MARK: Motion Manager Setup
+    
     func initMotionManager() {
         
         // Get xAcceleration
-        
         motionManager.accelerometerUpdateInterval = 0.1
         motionManager.startAccelerometerUpdatesToQueue(NSOperationQueue.currentQueue()!, withHandler: {
             (accelerometerData: CMAccelerometerData?, error: NSError?) in
@@ -254,106 +377,10 @@ class GameScene: SKScene {
         })
     }
     
-    // For creating stationary asteroids
-    // TODO: Create seperate method for creating asteroid at position with force (vector)
-    func createAsteroidAtPosition(position: CGPoint, ofType type: AsteroidType) -> AsteroidNode {
-        
-        let node = AsteroidNode()
-        node.position = CGPoint(x: position.x * scaleFactor, y: position.y)
-        node.name = "ASTEROID_NODE"
-        
-        node.type = type
-        var sprite: SKSpriteNode!
-        if type == .Moving {
-            sprite = SKSpriteNode(imageNamed: "asteroidWithTrail")
-        } else {
-            sprite = SKSpriteNode(imageNamed: "asteroid")
-        }
-        node.addChild(sprite)
-        
-        node.physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
-        node.physicsBody?.dynamic = false
-        
-        node.physicsBody?.categoryBitMask = CollisionCategoryBitMask.Asteroid
-        node.physicsBody?.collisionBitMask = 0
-        
-        return node
-    }
-    
-    // Draw pattern at location and return max y height
-    func drawPattern(pattern: [NSDictionary], patternX: CGFloat, patternY: CGFloat) -> CGFloat {
-        var maxY: CGFloat = 0
-        for asteroidPoint in pattern {
-            let x = asteroidPoint["x"]?.floatValue
-            let y = asteroidPoint["y"]?.floatValue
-            let positionX = CGFloat(x!) + patternX
-            let positionY = CGFloat(y!) + patternY
-            
-            // TODO: For now, all asteroids will be type normal
-            let asteroidNode = createAsteroidAtPosition(CGPoint(x: positionX, y: positionY), ofType: .Normal)
-            asteroidNode.name = "NORMAL_ASTEROID"
-            foreground.addChild(asteroidNode)
-            maxY = (positionY > maxY) ? positionY : maxY
-        }
-        
-        return maxY
-    }
-    
-    func drawAsteroids(startingAt y: CGFloat) {
-        let asteroids = levelData["Asteroids"] as! NSDictionary
-        let patterns = asteroids["Patterns"] as! NSDictionary
-        let numPatterns = patterns.count
-        var currentY = y
-        var pattern: [NSDictionary]!
-        var xPosition: CGFloat!
-        var nextY: CGFloat!
-        var r = 0
-        
-        while (currentY < maxLevelY) {
-            // Get random pattern
-            r = random()
-            pattern = patterns.allValues[r % numPatterns] as! [NSDictionary]
-            
-            // Get rancdom xPosition between 20 and self.size.width - 20
-            xPosition = (CGFloat(r) % (self.size.width - 40)) + 20
-            
-            nextY = drawPattern(pattern, patternX: xPosition, patternY: currentY)
-            currentY = nextY + 100
-        }
-    }
-    
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        
-        // If already started ignore touches
-        // TODO: Change this when power ups incorporated
-        if player.physicsBody!.dynamic {
-            return
-        }
-        
-        tapToStartNode.removeFromParent()
-
-        if let musicURL = NSBundle.mainBundle().URLForResource("rocket_thrust", withExtension: "wav") {
-            backgroundMusic = SKAudioNode(URL: musicURL)
-            addChild(backgroundMusic)
-        }
-        
-        player.physicsBody?.dynamic = true
-    }
-    
-    override func didSimulatePhysics() {
-        player.physicsBody?.velocity.dx = xAcceleration * 400.0
-        player.zRotation = self.rotation
-        
-        // Check x bounds for wrap around
-        if player.position.x < -20.0 {
-            player.position.x = self.size.width + 20.0
-        } else if (player.position.x > self.size.width + 20.0) {
-            player.position.x = -20.0
-        }
-    }
+    // MARK: End Game
     
     func endGame() {
-
+        
         motionManager.stopDeviceMotionUpdates()
         motionManager.stopAccelerometerUpdates()
         
@@ -364,6 +391,7 @@ class GameScene: SKScene {
         let endGameScene = EndGameScene(size: self.size)
         self.view!.presentScene(endGameScene, transition: reveal)
     }
+    
 }
 
 extension GameScene: SKPhysicsContactDelegate {
