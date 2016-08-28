@@ -23,6 +23,10 @@ class GameScene: SKScene {
     var xAcceleration: CGFloat = 0.0 // value from accelerometer
     var rotation: CGFloat = 0.0
     
+    var maxLevelY: CGFloat = 2000.0
+    
+    var levelData: NSDictionary!
+    
     // music
     var backgroundMusic: SKAudioNode!
     
@@ -77,8 +81,8 @@ class GameScene: SKScene {
         
         // Load level
         let levelPlist = NSBundle.mainBundle().pathForResource("Level_Singles", ofType: "plist")
-        let levelData = NSDictionary(contentsOfFile: levelPlist!)!
-        drawAsteroids(levelData)
+        levelData = NSDictionary(contentsOfFile: levelPlist!)!
+        drawAsteroids(startingAt: 300)
         
         // Player
         player = createPlayer()
@@ -118,6 +122,12 @@ class GameScene: SKScene {
             midground.position.y -=  0.5
             foreground.position.y -= 2
             player.position.y += 2
+        }
+        
+        // Check if we need to add more asteroids
+        if player.position.y > maxLevelY - 1000 {
+            maxLevelY += 1000
+            drawAsteroids(startingAt: maxLevelY - 1000)
         }
     }
     
@@ -274,17 +284,17 @@ class GameScene: SKScene {
         return maxY
     }
     
-    func generateAsteroidPositions(patterns: NSDictionary) {
-        var currentY: CGFloat = 300
-        let maxY: CGFloat = 5000
-        
+    func drawAsteroids(startingAt y: CGFloat) {
+        let asteroids = levelData["Asteroids"] as! NSDictionary
+        let patterns = asteroids["Patterns"] as! NSDictionary
         let numPatterns = patterns.count
+        var currentY = y
         var pattern: [NSDictionary]!
         var xPosition: CGFloat!
         var nextY: CGFloat!
         var r = 0
         
-        while (currentY < maxY) {
+        while (currentY < maxLevelY) {
             // Get random pattern
             r = random()
             pattern = patterns.allValues[r % numPatterns] as! [NSDictionary]
@@ -295,13 +305,6 @@ class GameScene: SKScene {
             nextY = drawPattern(pattern, patternX: xPosition, patternY: currentY)
             currentY = nextY + 100
         }
-        
-    }
-    
-    func drawAsteroids(levelData: NSDictionary) {
-        let asteroids = levelData["Asteroids"] as! NSDictionary
-        let asteroidPatterns = asteroids["Patterns"] as! NSDictionary
-        generateAsteroidPositions(asteroidPatterns)
     }
     
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
