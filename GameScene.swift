@@ -101,8 +101,6 @@ class GameScene: SKScene {
         hud.addChild(tapToStartNode)
         
         createHUD()
-        
-        initMotionManager()
     }
     
     override func update(currentTime: NSTimeInterval) {
@@ -139,7 +137,6 @@ class GameScene: SKScene {
         // Check if we should add a flying asteroid
         let r = random()
         if (r % 100) == 0 {
-            print("Drawing Asteroid!!")
              drawMovingAsteroid(r)
         }
         
@@ -160,6 +157,7 @@ class GameScene: SKScene {
             return
         }
         
+        initMotionManager()
         tapToStartNode.removeFromParent()
         
         if let musicURL = NSBundle.mainBundle().URLForResource("rocket_thrust", withExtension: "wav") {
@@ -282,14 +280,13 @@ class GameScene: SKScene {
         node.type = type
         
         var sprite: SKSpriteNode!
+        sprite = SKSpriteNode(imageNamed: "asteroid")
+        node.physicsBody = SKPhysicsBody(circleOfRadius: sprite.size.width / 2)
+        
         if type == .Moving {
-            sprite = SKSpriteNode(imageNamed: "asteroid")
-            node.physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
             node.physicsBody?.dynamic = true
             node.name = "MOVING_ASTEROID"
         } else {
-            sprite = SKSpriteNode(imageNamed: "asteroid")
-            node.physicsBody = SKPhysicsBody(circleOfRadius: sprite.size.width / 2)
             node.physicsBody?.dynamic = false
             node.name = "NORMAL_ASTEROID"
         }
