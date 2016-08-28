@@ -283,7 +283,7 @@ class GameScene: SKScene {
         
         var sprite: SKSpriteNode!
         if type == .Moving {
-            sprite = SKSpriteNode(imageNamed: "asteroidWithTrail")
+            sprite = SKSpriteNode(imageNamed: "asteroid")
             node.physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
             node.physicsBody?.dynamic = true
             node.name = "MOVING_ASTEROID"
@@ -349,10 +349,16 @@ class GameScene: SKScene {
 
         // Get random dx between -5 and 5, random dy between -10 and 5        
         let dx = (random() % 10) - 5
-        let dy = dx - 20
+        let dy = dx - 10
 
         asteroid.zRotation = atan2(CGFloat(dy), CGFloat(dx)) + CGFloat(M_PI_2)
         asteroid.physicsBody?.applyImpulse(CGVector(dx: dx, dy: dy))
+        
+        let fireEmitterPath = NSBundle.mainBundle().pathForResource("AsteroidFire", ofType: "sks")
+        let fireEmitter = NSKeyedUnarchiver.unarchiveObjectWithFile(fireEmitterPath!) as! SKEmitterNode
+        asteroid.addChild(fireEmitter)
+        fireEmitter.position = CGPoint(x: fireEmitter.position.x, y: fireEmitter.position.y - 10)
+        fireEmitter.zPosition = asteroid.zPosition + 1
     }
     
     // MARK: Motion Manager Setup
