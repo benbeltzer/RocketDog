@@ -24,6 +24,8 @@ class GameScene: SKScene {
     var rotation: CGFloat = 0.0
     
     var maxLevelY: CGFloat = 2000.0
+    var backgroundHeight: CGFloat!
+    var backgroundImageHeight: CGFloat!
     
     var levelData: NSDictionary!
     
@@ -58,9 +60,11 @@ class GameScene: SKScene {
         gameOver = false
         
         // Setup Background
-        background = createbackground()
+        background = createBackground(0)
         background.zPosition = 0
         addChild(background)
+        backgroundHeight = 64.0 * scaleFactor * 20
+        backgroundImageHeight = 64.0 * scaleFactor * 20
         
         // Setup Midground
         midground = createMidground()
@@ -129,18 +133,29 @@ class GameScene: SKScene {
             maxLevelY += 1000
             drawAsteroids(startingAt: maxLevelY - 1000)
         }
+        
+        // Check if we need to reload background
+        if (player.position.y > backgroundHeight - self.size.height - 50) {
+            backgroundHeight = backgroundHeight + backgroundImageHeight
+            let newBackground = createBackground(Int(backgroundHeight / backgroundImageHeight) - 1)
+            newBackground.zPosition = 0
+            background.addChild(newBackground)
+        }
     }
     
-    func createbackground() -> SKNode {
+    func createBackground(offset: Int) -> SKNode {
         
         let background = SKNode()
         let ySpacing = 64.0 * scaleFactor // image dimension in pixels
-        
+
+        // load 20 background nodes
         for i in 0...19 {
             let node = SKSpriteNode(imageNamed: String(format: "space_background%02d", i + 1))
             node.setScale(scaleFactor)
             node.anchorPoint = CGPoint(x: 0.5, y: 0.0)
-            node.position = CGPoint(x: self.size.width / 2, y: ySpacing * CGFloat(19-i))
+            
+            // offset used to calculate y when ship climbs beyond background already loaded
+            node.position = CGPoint(x: self.size.width / 2, y: ySpacing * (CGFloat(20 * offset + 19 - i)))
             background.addChild(node)
         }
         background.name = "BACKGROUND"
@@ -368,11 +383,3 @@ extension GameScene: SKPhysicsContactDelegate {
     }
     
 }
-
-
-
-
-
-
-
-
