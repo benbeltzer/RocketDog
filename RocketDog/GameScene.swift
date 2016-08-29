@@ -93,9 +93,6 @@ class GameScene: SKScene {
         player.name = "PLAYER"
         foreground.addChild(player)
         
-        // PowerUps
-        drawPowerUps()
-        
         // Tap to Start
         // TODO: Change this image to something else, like Blast Off!
         tapToStartNode.name = "TAPTOSTART"
@@ -154,10 +151,17 @@ class GameScene: SKScene {
             drawAsteroids(startingAt: maxLevelY - 1000)
         }
         
+        
+        // Check if we should spawn a power up
+        if (random() % 1000) == 0 {
+            drawPowerUp()
+        }
+        
         // Check if we should add a flying asteroid
-        let r = random()
-        if (r % 100) == 0 {
-             drawMovingAsteroid(r)
+        if (player.physicsBody!.dynamic) {
+            if (random() % 300) == 0 {
+                drawMovingAsteroid()
+            }
         }
         
         // Check if we need to reload background
@@ -279,7 +283,6 @@ class GameScene: SKScene {
     }
     
     // For creating stationary asteroids
-    // TODO: Modify Game Object For Asteroids
     func drawAsteroidAtPosition(position: CGPoint, ofType type: AsteroidType) -> AsteroidNode {
         
         let node = AsteroidNode(type: type)
@@ -329,13 +332,14 @@ class GameScene: SKScene {
         }
     }
     
-    func drawMovingAsteroid(randomValue: Int) {
-        let xPosition = CGFloat(randomValue) % self.size.width
+    func drawMovingAsteroid() {
+        let r = random()
+        let xPosition = CGFloat(r) % self.size.width
         let asteroid = drawAsteroidAtPosition(CGPoint(x: xPosition, y: player.position.y + self.size.height), ofType: .Moving)
         foreground.addChild(asteroid)
 
         // Get random dx between -5 and 5, random dy between -10 and 5        
-        let dx = (random() % 10) - 5
+        let dx = (r % 10) - 5
         let dy = dx - 10
 
         asteroid.zRotation = atan2(CGFloat(dy), CGFloat(dx)) + CGFloat(M_PI_2)
@@ -347,38 +351,37 @@ class GameScene: SKScene {
         fireEmitter.position = CGPoint(x: fireEmitter.position.x, y: fireEmitter.position.y - 10)
         fireEmitter.zPosition = asteroid.zPosition + 1
     }
-    
-    func drawPowerUps() {
-        let powerUpsPlist = NSBundle.mainBundle().pathForResource("PowerUps", ofType: "plist")!
-        let powerUps = NSArray(contentsOfFile: powerUpsPlist)! as! [NSDictionary]
-        
-        for powerUp in powerUps {
-            let xPosition = (powerUp["x"] as! CGFloat) * scaleFactor
-            let yPosition = powerUp["y"] as! CGFloat
-            let type = ShipType(rawValue: powerUp["type"] as! Int)!
 
-            // TODO: For now we assume all powerups are ships
-            let powerUpNode = ShipNode(type: type)
-            powerUpNode.position = CGPoint(x: xPosition, y: yPosition)
-
-            foreground.enumerateChildNodesWithName("NORMAL_ASTEROID", usingBlock: {
-                (node, stop) in
-
-                let sprite = node.childNodeWithName("ASTEROID")! as! SKSpriteNode
-                let origin = CGPoint(x: node.position.x - sprite.size.width / 2,
-                    y: node.position.y - sprite.size.height / 2)
-                let size = CGSize(width: sprite.size.width * 2, height: sprite.size.height * 2)
-                
-                let frame = CGRect(origin: origin, size: size)
-
-                if (CGRectContainsPoint(frame, powerUpNode.position)) {
-                    powerUpNode.position.x = ((powerUpNode.position.x + 50) % (self.size.width - 60)) + 30
-                    stop.memory = true
-                }
-            })
+    // If a node is near an asteroid, it will move it over
+    func checkForIntersectionWithAsteroid(node: GameObjectNode) -> GameObjectNode {
+        foreground.enumerateChildNodesWithName("NORMAL_ASTEROID", usingBlock: {
+            (asteroidNode, stop) in
             
-            foreground.addChild(powerUpNode)
-        }
+            let sprite = asteroidNode.childNodeWithName("ASTEROID")! as! SKSpriteNode
+            let origin = CGPoint(x: asteroidNode.position.x - sprite.size.width / 2,
+                y: asteroidNode.position.y - sprite.size.height / 2)
+            let size = CGSize(width: sprite.size.width * 2, height: sprite.size.height * 2)
+            
+            let frame = CGRect(origin: origin, size: size)
+            
+            if (CGRectContainsPoint(frame, node.position)) {
+                node.position.x = ((node.position.x + 50) % (self.size.width - 60)) + 30
+                stop.memory = true
+            }
+        })
+        return node
+    }
+    
+    func drawPowerUp() {
+        // TODO: For now pick a LaserShip, later we will choose random power up from plist
+        // plist will just store a list of power up types, or use an enum in gameobjectnode
+        let xPosition = (CGFloat(random()) % (self.size.width - 60)) + 30
+        let yPosition = player.position.y + self.size.height + 100
+        
+        var node = ShipNode(type: .Laser)
+        node.position = CGPoint(x: xPosition * scaleFactor, y: yPosition)
+        node = checkForIntersectionWithAsteroid(node) as! ShipNode
+        foreground.addChild(node)
     }
     
     // MARK: Motion Manager Setup
