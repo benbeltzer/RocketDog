@@ -16,16 +16,17 @@
 		4370B5541D739234008D50C2 /* AsteroidFire.sks in Resources */ = {isa = PBXBuildFile; fileRef = 4370B5531D739234008D50C2 /* AsteroidFire.sks */; };
 		437FA4D51D6F9B4E00395C4C /* Assets.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 437FA4D41D6F9B4E00395C4C /* Assets.atlas */; };
 		437FA4D71D6FA36700395C4C /* GameObjectNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 437FA4D61D6FA36700395C4C /* GameObjectNode.swift */; };
-		43C2D43E1D727BE700F73DCB /* Level02.plist in Resources */ = {isa = PBXBuildFile; fileRef = 43C2D43D1D727BE700F73DCB /* Level02.plist */; };
-		43C2D4401D728D3A00F73DCB /* Level_Singles.plist in Resources */ = {isa = PBXBuildFile; fileRef = 43C2D43F1D728D3A00F73DCB /* Level_Singles.plist */; };
 		43C2D4421D728F2C00F73DCB /* rocket_thrust.wav in Resources */ = {isa = PBXBuildFile; fileRef = 43C2D4411D728F2C00F73DCB /* rocket_thrust.wav */; };
 		43DD751C1D6E739A00DF5EB2 /* space_background.png in Resources */ = {isa = PBXBuildFile; fileRef = 43DD75061D6E739A00DF5EB2 /* space_background.png */; };
-		43FC68601D70C32C00A84272 /* spark.png in Resources */ = {isa = PBXBuildFile; fileRef = 43FC685E1D70C32C00A84272 /* spark.png */; };
+		43E9B9D11D73C7BE003C7C6E /* Level01.plist in Resources */ = {isa = PBXBuildFile; fileRef = 43E9B9CD1D73C7BE003C7C6E /* Level01.plist */; };
+		43E9B9D21D73C7BE003C7C6E /* Level02.plist in Resources */ = {isa = PBXBuildFile; fileRef = 43E9B9CE1D73C7BE003C7C6E /* Level02.plist */; };
+		43E9B9D31D73C7BE003C7C6E /* Level_Singles.plist in Resources */ = {isa = PBXBuildFile; fileRef = 43E9B9CF1D73C7BE003C7C6E /* Level_Singles.plist */; };
+		43E9B9D41D73C7BE003C7C6E /* PowerUps.plist in Resources */ = {isa = PBXBuildFile; fileRef = 43E9B9D01D73C7BE003C7C6E /* PowerUps.plist */; };
+		43E9B9E21D73DF90003C7C6E /* spark.png in Resources */ = {isa = PBXBuildFile; fileRef = 43E9B9E01D73DF90003C7C6E /* spark.png */; };
 		43FC68621D70D03600A84272 /* spark.sks in Resources */ = {isa = PBXBuildFile; fileRef = 43FC68611D70D03600A84272 /* spark.sks */; };
 		43FC68641D70D05F00A84272 /* smoke.sks in Resources */ = {isa = PBXBuildFile; fileRef = 43FC68631D70D05F00A84272 /* smoke.sks */; };
 		43FC68681D70D9DC00A84272 /* fire.sks in Resources */ = {isa = PBXBuildFile; fileRef = 43FC68671D70D9DC00A84272 /* fire.sks */; };
 		43FC686C1D70DDDE00A84272 /* explosion.wav in Resources */ = {isa = PBXBuildFile; fileRef = 43FC686B1D70DDDE00A84272 /* explosion.wav */; };
-		43FC686E1D70E5DF00A84272 /* Level01.plist in Resources */ = {isa = PBXBuildFile; fileRef = 43FC686D1D70E5DF00A84272 /* Level01.plist */; };
 		43FC68701D71175A00A84272 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43FC686F1D71175A00A84272 /* GameState.swift */; };
 		43FC68761D711D3300A84272 /* EndGameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43FC68751D711D3300A84272 /* EndGameScene.swift */; };
 		43FD0B951D6E7E1900DBB23C /* space_background01@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 43FD0B811D6E7E1900DBB23C /* space_background01@2x.png */; };
@@ -82,16 +83,17 @@
 		4370B5531D739234008D50C2 /* AsteroidFire.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = AsteroidFire.sks; sourceTree = "<group>"; };
 		437FA4D41D6F9B4E00395C4C /* Assets.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = Assets.atlas; sourceTree = "<group>"; };
 		437FA4D61D6FA36700395C4C /* GameObjectNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameObjectNode.swift; sourceTree = "<group>"; };
-		43C2D43D1D727BE700F73DCB /* Level02.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Level02.plist; sourceTree = "<group>"; };
-		43C2D43F1D728D3A00F73DCB /* Level_Singles.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Level_Singles.plist; sourceTree = "<group>"; };
 		43C2D4411D728F2C00F73DCB /* rocket_thrust.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = rocket_thrust.wav; sourceTree = "<group>"; };
 		43DD75061D6E739A00DF5EB2 /* space_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = space_background.png; sourceTree = "<group>"; };
-		43FC685E1D70C32C00A84272 /* spark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spark.png; sourceTree = "<group>"; };
+		43E9B9CD1D73C7BE003C7C6E /* Level01.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Level01.plist; sourceTree = "<group>"; };
+		43E9B9CE1D73C7BE003C7C6E /* Level02.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Level02.plist; sourceTree = "<group>"; };
+		43E9B9CF1D73C7BE003C7C6E /* Level_Singles.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Level_Singles.plist; sourceTree = "<group>"; };
+		43E9B9D01D73C7BE003C7C6E /* PowerUps.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = PowerUps.plist; sourceTree = "<group>"; };
+		43E9B9E01D73DF90003C7C6E /* spark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spark.png; sourceTree = "<group>"; };
 		43FC68611D70D03600A84272 /* spark.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = spark.sks; sourceTree = "<group>"; };
 		43FC68631D70D05F00A84272 /* smoke.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = smoke.sks; sourceTree = "<group>"; };
 		43FC68671D70D9DC00A84272 /* fire.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = fire.sks; sourceTree = "<group>"; };
 		43FC686B1D70DDDE00A84272 /* explosion.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = explosion.wav; sourceTree = "<group>"; };
-		43FC686D1D70E5DF00A84272 /* Level01.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Level01.plist; sourceTree = "<group>"; };
 		43FC686F1D71175A00A84272 /* GameState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameState.swift; sourceTree = "<group>"; };
 		43FC68751D711D3300A84272 /* EndGameScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EndGameScene.swift; sourceTree = "<group>"; };
 		43FD0B811D6E7E1900DBB23C /* space_background01@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "space_background01@2x.png"; sourceTree = "<group>"; };
@@ -172,19 +174,17 @@
 				43FC686F1D71175A00A84272 /* GameState.swift */,
 				437FA4D61D6FA36700395C4C /* GameObjectNode.swift */,
 				43FC68611D70D03600A84272 /* spark.sks */,
-				43FC685E1D70C32C00A84272 /* spark.png */,
+				43E9B9E01D73DF90003C7C6E /* spark.png */,
 				43FC68671D70D9DC00A84272 /* fire.sks */,
 				4370B5531D739234008D50C2 /* AsteroidFire.sks */,
 				43FC68631D70D05F00A84272 /* smoke.sks */,
 				4347612B1D6E337300C6AFCF /* GameViewController.swift */,
 				4347612D1D6E337300C6AFCF /* Main.storyboard */,
+				434761321D6E337300C6AFCF /* LaunchScreen.storyboard */,
 				434761301D6E337300C6AFCF /* Assets.xcassets */,
 				43FC686A1D70DDDE00A84272 /* Sounds */,
 				435461A41D6E653C00B289CE /* Graphics */,
-				434761321D6E337300C6AFCF /* LaunchScreen.storyboard */,
-				43FC686D1D70E5DF00A84272 /* Level01.plist */,
-				43C2D43D1D727BE700F73DCB /* Level02.plist */,
-				43C2D43F1D728D3A00F73DCB /* Level_Singles.plist */,
+				43E9B9CC1D73C7BE003C7C6E /* Resources */,
 				434761351D6E337300C6AFCF /* Info.plist */,
 			);
 			path = RocketDog;
@@ -245,6 +245,17 @@
 				43FD0B941D6E7E1900DBB23C /* space_background20@2x.png */,
 			);
 			path = Background;
+			sourceTree = "<group>";
+		};
+		43E9B9CC1D73C7BE003C7C6E /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				43E9B9CD1D73C7BE003C7C6E /* Level01.plist */,
+				43E9B9CE1D73C7BE003C7C6E /* Level02.plist */,
+				43E9B9CF1D73C7BE003C7C6E /* Level_Singles.plist */,
+				43E9B9D01D73C7BE003C7C6E /* PowerUps.plist */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		43FC686A1D70DDDE00A84272 /* Sounds */ = {
@@ -317,9 +328,9 @@
 			files = (
 				43FD0BC01D6E7FA100DBB23C /* space_background04.png in Resources */,
 				43FD0B9E1D6E7E1900DBB23C /* space_background10@2x.png in Resources */,
-				43FC686E1D70E5DF00A84272 /* Level01.plist in Resources */,
 				43FD0B9D1D6E7E1900DBB23C /* space_background09@2x.png in Resources */,
 				43FD0BA61D6E7E1900DBB23C /* space_background18@2x.png in Resources */,
+				43E9B9D41D73C7BE003C7C6E /* PowerUps.plist in Resources */,
 				43FD0BCB1D6E7FA100DBB23C /* space_background15.png in Resources */,
 				4370B5541D739234008D50C2 /* AsteroidFire.sks in Resources */,
 				43FD0B991D6E7E1900DBB23C /* space_background05@2x.png in Resources */,
@@ -329,6 +340,7 @@
 				43FD0BCD1D6E7FA100DBB23C /* space_background17.png in Resources */,
 				434761341D6E337300C6AFCF /* LaunchScreen.storyboard in Resources */,
 				43FD0BC51D6E7FA100DBB23C /* space_background09.png in Resources */,
+				43E9B9D11D73C7BE003C7C6E /* Level01.plist in Resources */,
 				43FD0BA41D6E7E1900DBB23C /* space_background16@2x.png in Resources */,
 				43FD0BA31D6E7E1900DBB23C /* space_background15@2x.png in Resources */,
 				43FD0B9C1D6E7E1900DBB23C /* space_background08@2x.png in Resources */,
@@ -337,12 +349,14 @@
 				43FC68681D70D9DC00A84272 /* fire.sks in Resources */,
 				43FD0BA11D6E7E1900DBB23C /* space_background13@2x.png in Resources */,
 				43FD0BC21D6E7FA100DBB23C /* space_background06.png in Resources */,
+				43E9B9D21D73C7BE003C7C6E /* Level02.plist in Resources */,
+				43E9B9E21D73DF90003C7C6E /* spark.png in Resources */,
 				43FD0BC11D6E7FA100DBB23C /* space_background05.png in Resources */,
 				43FD0BCE1D6E7FA100DBB23C /* space_background18.png in Resources */,
+				43E9B9D31D73C7BE003C7C6E /* Level_Singles.plist in Resources */,
 				43FD0BCA1D6E7FA100DBB23C /* space_background14.png in Resources */,
 				43FD0BCC1D6E7FA100DBB23C /* space_background16.png in Resources */,
 				437FA4D51D6F9B4E00395C4C /* Assets.atlas in Resources */,
-				43C2D4401D728D3A00F73DCB /* Level_Singles.plist in Resources */,
 				43FD0B961D6E7E1900DBB23C /* space_background02@2x.png in Resources */,
 				43FD0B9F1D6E7E1900DBB23C /* space_background11@2x.png in Resources */,
 				43FC68621D70D03600A84272 /* spark.sks in Resources */,
@@ -363,10 +377,8 @@
 				43C2D4421D728F2C00F73DCB /* rocket_thrust.wav in Resources */,
 				43FD0B9A1D6E7E1900DBB23C /* space_background06@2x.png in Resources */,
 				43FD0BA51D6E7E1900DBB23C /* space_background17@2x.png in Resources */,
-				43C2D43E1D727BE700F73DCB /* Level02.plist in Resources */,
 				43FD0BC81D6E7FA100DBB23C /* space_background12.png in Resources */,
 				43FD0BC41D6E7FA100DBB23C /* space_background08.png in Resources */,
-				43FC68601D70C32C00A84272 /* spark.png in Resources */,
 				43FD0B971D6E7E1900DBB23C /* space_background03@2x.png in Resources */,
 				43FD0BC31D6E7FA100DBB23C /* space_background07.png in Resources */,
 				43FD0BA81D6E7E1900DBB23C /* space_background20@2x.png in Resources */,
