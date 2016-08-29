@@ -122,6 +122,7 @@ class AsteroidNode: GameObjectNode {
         self.type = type
         
         let sprite = SKSpriteNode(imageNamed: "asteroid")
+        sprite.name = "ASTEROID"
         self.physicsBody = SKPhysicsBody(circleOfRadius: sprite.size.width / 2)
         self.addChild(sprite)
 
@@ -176,6 +177,7 @@ class ShipNode: GameObjectNode {
             sprite = SKSpriteNode(imageNamed: "redRocket")
             self.physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
             self.physicsBody?.categoryBitMask = CollisionCategoryBitMask.PowerUp
+            self.physicsBody?.contactTestBitMask = CollisionCategoryBitMask.Asteroid
         }
         addChild(sprite)
         

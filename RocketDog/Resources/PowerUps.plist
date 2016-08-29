@@ -10,5 +10,29 @@
 		<key>type</key>
 		<integer>1</integer>
 	</dict>
+	<dict>
+		<key>x</key>
+		<integer>50</integer>
+		<key>y</key>
+		<real>2000</real>
+		<key>type</key>
+		<integer>1</integer>
+	</dict>
+	<dict>
+		<key>x</key>
+		<integer>100</integer>
+		<key>y</key>
+		<integer>3000</integer>
+		<key>type</key>
+		<integer>1</integer>
+	</dict>
+	<dict>
+		<key>x</key>
+		<integer>200</integer>
+		<key>y</key>
+		<integer>4000</integer>
+		<key>type</key>
+		<integer>1</integer>
+	</dict>
 </array>
 </plist>

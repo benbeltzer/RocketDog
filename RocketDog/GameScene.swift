@@ -360,6 +360,23 @@ class GameScene: SKScene {
             // TODO: For now we assume all powerups are ships
             let powerUpNode = ShipNode(type: type)
             powerUpNode.position = CGPoint(x: xPosition, y: yPosition)
+
+            foreground.enumerateChildNodesWithName("NORMAL_ASTEROID", usingBlock: {
+                (node, stop) in
+
+                let sprite = node.childNodeWithName("ASTEROID")! as! SKSpriteNode
+                let origin = CGPoint(x: node.position.x - sprite.size.width / 2,
+                    y: node.position.y - sprite.size.height / 2)
+                let size = CGSize(width: sprite.size.width * 2, height: sprite.size.height * 2)
+                
+                let frame = CGRect(origin: origin, size: size)
+
+                if (CGRectContainsPoint(frame, powerUpNode.position)) {
+                    powerUpNode.position.x = ((powerUpNode.position.x + 50) % (self.size.width - 60)) + 30
+                    stop.memory = true
+                }
+            })
+            
             foreground.addChild(powerUpNode)
         }
     }
@@ -412,18 +429,19 @@ extension GameScene: SKPhysicsContactDelegate {
             
             // Collision between laser and asteroid
             if let asteroid = contact.bodyA.node as? AsteroidNode,
-                let laser = (contact.bodyB.node as? LaserNode) {
+                laser = (contact.bodyB.node as? LaserNode) {
                 updateHUD = laser.collisionWithAsteroid(asteroid)
             } else if let asteroid = contact.bodyB.node as? AsteroidNode,
-                let laser = contact.bodyA.node as? LaserNode {
+                laser = contact.bodyA.node as? LaserNode {
                 updateHUD = laser.collisionWithAsteroid(asteroid)
             }
             
         } else {
             // Collision between player and something
             let nonPlayerNode = (contact.bodyA.node != player) ? contact.bodyA.node : contact.bodyB.node
-            let other = nonPlayerNode as! GameObjectNode
-            updateHUD = other.collisionWithPlayer(player)
+            if let other = nonPlayerNode as? GameObjectNode {
+                updateHUD = other.collisionWithPlayer(player)
+            }
         }
         
         // Update the HUD if necessary
