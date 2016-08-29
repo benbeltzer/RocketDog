@@ -93,7 +93,7 @@ class GameObjectNode: SKNode {
             SKAction.scaleBy(1.2, duration: 0.1),
             SKAction.runBlock({
                 smokeEmitter.particleBirthRate = 0
-                if let _ = self as? Ship {
+                if let _ = self as? ShipNode {
                     gameScene.endGame()
                 }
             })
@@ -156,7 +156,7 @@ class AsteroidNode: GameObjectNode {
     
 }
 
-class Ship: GameObjectNode {
+class ShipNode: GameObjectNode {
     
     var type: ShipType!
     
@@ -206,10 +206,10 @@ class Ship: GameObjectNode {
             player.removeAllChildren()
             let sprite = SKSpriteNode(imageNamed: "redRocket")
             player.addChild(sprite)
-            (player as! Ship).type = .Laser
+            (player as! ShipNode).type = .Laser
 
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 10 * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
-                (player as! Ship).flicker(0.5)
+                (player as! ShipNode).flicker(0.5)
             })
         }
         
@@ -241,10 +241,12 @@ class Ship: GameObjectNode {
     
 }
 
-class Laser: GameObjectNode {
+class LaserNode: GameObjectNode {
    
     override init() {
         super.init()
+        
+        self.name = "LASER"
         
         let sprite = SKSpriteNode(imageNamed: "laser")
         self.physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
@@ -266,8 +268,12 @@ class Laser: GameObjectNode {
         self.removeFromParent()
         return false
     }
+    
+    override func checkNodeRemoval(playerY: CGFloat) {
+        if let gameScene = self.scene as? GameScene {
+            if (self.position.y > playerY + gameScene.size.height - 50) {
+                self.removeFromParent()
+            }
+        }
+    }
 }
-
-
-
-

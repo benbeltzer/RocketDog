@@ -17,7 +17,7 @@ class GameScene: SKScene {
     var foreground: SKNode!
     var hud: SKNode!
     
-    var player: Ship!
+    var player: ShipNode!
     
     let motionManager = CMMotionManager()
     var xAcceleration: CGFloat = 0.0 // value from accelerometer
@@ -117,10 +117,27 @@ class GameScene: SKScene {
         scoreLabel.text = "\(GameState.sharedInstance.score)"
         
         // Remove past objects
-        foreground.enumerateChildNodesWithName("ASTEROID_NODE", usingBlock: {
+        foreground.enumerateChildNodesWithName("*", usingBlock: {
             (node, stop) in
-            let asteroid = node as! AsteroidNode
-            asteroid.checkNodeRemoval(self.player.position.y)
+            
+            if let name = node.name {
+                switch name {
+                case "MOVING_ASTEROID", "NORMAL_ASTEROID":
+                    let asteroid = node as! AsteroidNode
+                    asteroid.checkNodeRemoval(self.player.position.y)
+                case "LASER":
+                    let laser = node as! LaserNode
+                    laser.checkNodeRemoval(self.player.position.y)
+                default: break
+                }
+            }
+            
+            
+            if (node.name == "MOVING_ASTEROID" || node.name == "NORMAL_ASTEROID") {
+                let asteroid = node as! AsteroidNode
+                asteroid.checkNodeRemoval(self.player.position.y)
+            }
+            
         })
         
         // Paralax Effect
@@ -155,20 +172,14 @@ class GameScene: SKScene {
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         
         // If already started ignore touches
-        // TODO: Change this when power ups incorporated
         if (player.physicsBody!.dynamic && player.type == .Normal) {
             return
         } else if (player.type == .Laser) {
             runAction(SKAction.playSoundFileNamed("explosion.wav", waitForCompletion: false))
-            let leftLaser = Laser()
-            let rightLaser = Laser()
-            leftLaser.position = CGPoint(x: player.position.x - 10, y: player.position.y)
-            rightLaser.position = CGPoint(x: player.position.x + 10, y: player.position.y)
-            foreground.addChild(leftLaser)
-            foreground.addChild(rightLaser)
-            let vector = CGVector(dx: 0, dy: 50)
-            leftLaser.physicsBody?.applyImpulse(vector)
-            rightLaser.physicsBody?.applyImpulse(vector)
+            let laser = LaserNode()
+            laser.position = player.position
+            foreground.addChild(laser)
+            laser.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 50))
             return
         }
         
@@ -246,9 +257,9 @@ class GameScene: SKScene {
         return midgroundNode
     }
     
-    func createPlayer() -> Ship {
+    func createPlayer() -> ShipNode {
         
-        let playerNode = Ship(type: .Normal)
+        let playerNode = ShipNode(type: .Normal)
         playerNode.position = CGPoint(x: self.size.width / 2, y: 80.0)
         
         return playerNode
@@ -347,7 +358,7 @@ class GameScene: SKScene {
             let type = ShipType(rawValue: powerUp["type"] as! Int)!
 
             // TODO: For now we assume all powerups are ships
-            let powerUpNode = Ship(type: type)
+            let powerUpNode = ShipNode(type: type)
             powerUpNode.position = CGPoint(x: xPosition, y: yPosition)
             foreground.addChild(powerUpNode)
         }
@@ -397,18 +408,17 @@ extension GameScene: SKPhysicsContactDelegate {
     func didBeginContact(contact: SKPhysicsContact) {
         var updateHUD = false
 
-        if let _ = contact.bodyA.node as? Laser, _ = contact.bodyB.node as? Laser {
-            print("Their both lasers!!!")
-        } else if (contact.bodyA.node != player && contact.bodyB.node != player) {
+        if (contact.bodyA.node != player && contact.bodyB.node != player) {
+            
             // Collision between laser and asteroid
-            if let asteroid = contact.bodyA.node as? AsteroidNode {
-                let laser = (contact.bodyB.node as! Laser)
+            if let asteroid = contact.bodyA.node as? AsteroidNode,
+                let laser = (contact.bodyB.node as? LaserNode) {
                 updateHUD = laser.collisionWithAsteroid(asteroid)
-            } else {
-                let asteroid = contact.bodyB.node as! AsteroidNode
-                let laser = contact.bodyA.node as! Laser
+            } else if let asteroid = contact.bodyB.node as? AsteroidNode,
+                let laser = contact.bodyA.node as? LaserNode {
                 updateHUD = laser.collisionWithAsteroid(asteroid)
             }
+            
         } else {
             // Collision between player and something
             let nonPlayerNode = (contact.bodyA.node != player) ? contact.bodyA.node : contact.bodyB.node
