@@ -26,6 +26,7 @@ class GameScene: SKScene {
     var maxLevelY: CGFloat = 2000.0
     var backgroundHeight: CGFloat!
     var backgroundImageHeight: CGFloat!
+    var backgroundReflected = false
     
     var levelData: NSDictionary!
     
@@ -60,7 +61,7 @@ class GameScene: SKScene {
         gameOver = false
         
         // Setup Background
-        background = createBackground(0)
+        background = createBackground(0, reflected: backgroundReflected)
         background.zPosition = 0
         addChild(background)
         backgroundHeight = 64.0 * scaleFactor * 20
@@ -110,7 +111,7 @@ class GameScene: SKScene {
         }
         
         // Update Score
-        GameState.sharedInstance.score = Int(player.position.y) - 79
+        GameState.sharedInstance.score = Int(player.position.y) - 160
         scoreLabel.text = "\(GameState.sharedInstance.score)"
         
         // Remove past objects
@@ -167,7 +168,7 @@ class GameScene: SKScene {
         // Check if we need to reload background
         if (player.position.y > backgroundHeight - self.size.height - 50) {
             backgroundHeight = backgroundHeight + backgroundImageHeight
-            let newBackground = createBackground(Int(backgroundHeight / backgroundImageHeight) - 1)
+            let newBackground = createBackground(Int(backgroundHeight / backgroundImageHeight) - 1, reflected: backgroundReflected)
             newBackground.zPosition = 0
             background.addChild(newBackground)
         }
@@ -212,14 +213,15 @@ class GameScene: SKScene {
     
     // MARK: Node Creating
     
-    func createBackground(offset: Int) -> SKNode {
+    func createBackground(offset: Int, reflected: Bool) -> SKNode {
         
         let background = SKNode()
         let ySpacing = 64.0 * scaleFactor // image dimension in pixels
-
+        let imageName = (backgroundReflected) ? "space_background_reflected%02d" : "space_background%02d"
+        
         // load 20 background nodes
         for i in 0...19 {
-            let node = SKSpriteNode(imageNamed: String(format: "space_background%02d", i + 1))
+            let node = SKSpriteNode(imageNamed: String(format: imageName, i + 1))
             node.setScale(scaleFactor)
             node.anchorPoint = CGPoint(x: 0.5, y: 0.0)
             
@@ -228,6 +230,7 @@ class GameScene: SKScene {
             background.addChild(node)
         }
         background.name = "BACKGROUND"
+        backgroundReflected = !backgroundReflected
         return background
     }
     
