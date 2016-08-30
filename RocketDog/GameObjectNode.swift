@@ -35,7 +35,8 @@ class GameObjectNode: SKNode {
     }
     
     func checkNodeRemoval(playerY: CGFloat) {
-        if playerY > self.position.y + 100.0 {
+        let playerStartingY: CGFloat = 160.0
+        if playerY > self.position.y + playerStartingY {
             self.removeFromParent()
         }
     }
@@ -160,39 +161,41 @@ class AsteroidNode: GameObjectNode {
 class ShipNode: GameObjectNode {
     
     var type: ShipType!
+    var extraPowerUpTime = 0
     
     init(type: ShipType) {
         super.init()
         
         self.type = type
+        
         var sprite: SKSpriteNode!
         
         switch type {
         case .Normal:
             sprite = SKSpriteNode(imageNamed: "blueRocket")
-            self.physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
-            self.physicsBody?.categoryBitMask = CollisionCategoryBitMask.Player
-            self.physicsBody?.contactTestBitMask = CollisionCategoryBitMask.Asteroid | CollisionCategoryBitMask.PowerUp
+            physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
+            physicsBody?.categoryBitMask = CollisionCategoryBitMask.Player
+            physicsBody?.contactTestBitMask = CollisionCategoryBitMask.Asteroid | CollisionCategoryBitMask.PowerUp
         case .Laser:
             sprite = SKSpriteNode(imageNamed: "redRocket")
-            self.physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
-            self.physicsBody?.categoryBitMask = CollisionCategoryBitMask.PowerUp
-            self.physicsBody?.contactTestBitMask = CollisionCategoryBitMask.Asteroid
+            physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
+            physicsBody?.categoryBitMask = CollisionCategoryBitMask.PowerUp
+            physicsBody?.contactTestBitMask = CollisionCategoryBitMask.Asteroid
         }
         addChild(sprite)
         
-        self.physicsBody?.dynamic = false
-        self.physicsBody?.allowsRotation = false
+        physicsBody?.dynamic = false
+        physicsBody?.allowsRotation = false
         
         // Node interaction properties
-        self.physicsBody?.restitution = 1.0
-        self.physicsBody?.linearDamping = 0.0
-        self.physicsBody?.angularDamping = 0.0
-        self.physicsBody?.friction = 0.0
+        physicsBody?.restitution = 1.0
+        physicsBody?.linearDamping = 0.0
+        physicsBody?.angularDamping = 0.0
+        physicsBody?.friction = 0.0
         
         // Physics Body Setup
-        self.physicsBody?.usesPreciseCollisionDetection = true
-        self.physicsBody?.collisionBitMask = 0 // Dont let physics engine handle player collisions
+        physicsBody?.usesPreciseCollisionDetection = true
+        physicsBody?.collisionBitMask = 0 // Dont let physics engine handle player collisions
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -200,20 +203,22 @@ class ShipNode: GameObjectNode {
     }
     
     override func collisionWithPlayer(player: SKNode) -> Bool {
-        
-        if (type != .Normal) {
-            // Swap player's ship for special one
-            self.removeFromParent()
-            
-            player.removeAllChildren()
-            let sprite = SKSpriteNode(imageNamed: "redRocket")
-            player.addChild(sprite)
-            (player as! ShipNode).type = .Laser
+        // Power Up ship and player collided
 
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 10 * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
+        self.removeFromParent()
+        
+        player.removeAllChildren()
+        let sprite = SKSpriteNode(imageNamed: "redRocket")
+        player.addChild(sprite)
+        (player as! ShipNode).type = .Laser
+        (player as! ShipNode).extraPowerUpTime += 1
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 10 * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
+            (player as! ShipNode).extraPowerUpTime -= 1
+            if (player as! ShipNode).extraPowerUpTime == 0 {
                 (player as! ShipNode).flicker(0.5)
-            })
-        }
+            }
+        })
         
         return false
     }
@@ -221,6 +226,12 @@ class ShipNode: GameObjectNode {
     // Ship flickers between special and normal as time runs out
     func flicker(interval: CGFloat) {
         if (interval <= 0.05) {
+            return
+        } else if extraPowerUpTime > 0 {
+            removeAllChildren()
+            let sprite = SKSpriteNode(imageNamed: "redRocket")
+            addChild(sprite)
+            type = .Laser
             return
         } else {
             let waitTime = Int64(CGFloat(NSEC_PER_SEC) * interval)

@@ -86,7 +86,7 @@ class GameScene: SKScene {
         // Load level
         let levelPlist = NSBundle.mainBundle().pathForResource("Level_Singles", ofType: "plist")
         levelData = NSDictionary(contentsOfFile: levelPlist!)!
-        drawAsteroids(startingAt: 300)
+        drawAsteroids(startingAt: 400)
         
         // Player
         player = createPlayer()
@@ -96,7 +96,7 @@ class GameScene: SKScene {
         // Tap to Start
         // TODO: Change this image to something else, like Blast Off!
         tapToStartNode.name = "TAPTOSTART"
-        tapToStartNode.position = CGPoint(x: self.size.width / 2, y: 200.0)
+        tapToStartNode.position = CGPoint(x: self.size.width / 2, y: player.position.y + 100)
         tapToStartNode.zPosition = player.zPosition + 1
         hud.addChild(tapToStartNode)
         
@@ -264,7 +264,7 @@ class GameScene: SKScene {
     func createPlayer() -> ShipNode {
         
         let playerNode = ShipNode(type: .Normal)
-        playerNode.position = CGPoint(x: self.size.width / 2, y: 80.0)
+        playerNode.position = CGPoint(x: self.size.width / 2, y: 160.0)
         
         return playerNode
     }
