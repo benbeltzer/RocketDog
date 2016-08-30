@@ -36,7 +36,7 @@ class GameScene: SKScene {
     // For iPhone 6
     var scaleFactor: CGFloat!
     
-    let tapToStartNode = SKSpriteNode(imageNamed: "TapToStart")
+    let tapToStartNode = SKLabelNode(fontNamed: "Futura-Medium")
     
     var scoreLabel: SKLabelNode!
     
@@ -98,6 +98,10 @@ class GameScene: SKScene {
         // Tap to Start
         // TODO: Change this image to something else, like Blast Off!
         tapToStartNode.name = "TAPTOSTART"
+        tapToStartNode.fontSize = 30
+        tapToStartNode.fontColor = SKColor.whiteColor()
+        tapToStartNode.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.Center
+        tapToStartNode.text = "TAP TO BLAST OFF!"
         tapToStartNode.position = CGPoint(x: self.size.width / 2, y: player.position.y + 100)
         tapToStartNode.zPosition = player.zPosition + 1
         hud.addChild(tapToStartNode)
@@ -112,7 +116,7 @@ class GameScene: SKScene {
         }
         
         // Update Score
-        GameState.sharedInstance.score = Int(player.position.y) - 160
+        GameState.sharedInstance.score = max(Int(player.position.y) - 160, 0)
         scoreLabel.text = "\(GameState.sharedInstance.score)"
         
         // Remove past objects
@@ -161,7 +165,7 @@ class GameScene: SKScene {
         
         // Check if we should add a flying asteroid
         if (player.physicsBody!.dynamic) {
-            if (random() % 300) == 0 {
+            if (random() % 150) == 0 {
                 drawMovingAsteroid()
             }
         }
@@ -290,7 +294,7 @@ class GameScene: SKScene {
     func createHUD() {
 
         // TODO: Change this dumb font
-        scoreLabel = SKLabelNode(fontNamed: "ChalkboardSE-Bold")
+        scoreLabel = SKLabelNode(fontNamed: "Futura-Medium")
         scoreLabel.fontSize = 30
         scoreLabel.fontColor = SKColor.whiteColor()
         scoreLabel.position = CGPoint(x: self.size.width-20, y: self.size.height-40)
@@ -356,7 +360,7 @@ class GameScene: SKScene {
         let asteroid = drawAsteroidAtPosition(CGPoint(x: xPosition, y: player.position.y + self.size.height), ofType: .Moving)
         foreground.addChild(asteroid)
 
-        // Get random dx between -5 and 5, random dy between -10 and 5        
+        // Get random dx between -5 and 5, random dy between -15 and -5
         let dx = (r % 10) - 5
         let dy = dx - 10
 

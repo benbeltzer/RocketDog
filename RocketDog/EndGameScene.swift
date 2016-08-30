@@ -21,7 +21,7 @@ class EndGameScene: SKScene {
         super.init(size: size)
         
         // Score
-        let scoreLabel = SKLabelNode(fontNamed: "ChalkboardSE-Bold")
+        let scoreLabel = SKLabelNode(fontNamed: "Futura-Medium")
         scoreLabel.fontSize = 60
         scoreLabel.fontColor = SKColor.whiteColor()
         scoreLabel.position = CGPoint(x: self.size.width / 2, y: 300)
@@ -30,7 +30,7 @@ class EndGameScene: SKScene {
         addChild(scoreLabel)
         
         // High Score
-        let highScoreLabel = SKLabelNode(fontNamed: "ChalkboardSE-Bold")
+        let highScoreLabel = SKLabelNode(fontNamed: "Futura-Medium")
         highScoreLabel.fontSize = 30
         highScoreLabel.fontColor = SKColor.cyanColor()
         highScoreLabel.position = CGPoint(x: self.size.width / 2, y: 150)
@@ -39,7 +39,7 @@ class EndGameScene: SKScene {
         addChild(highScoreLabel)
         
         // Try again
-        let tryAgainLabel = SKLabelNode(fontNamed: "ChalkboardSE-Bold")
+        let tryAgainLabel = SKLabelNode(fontNamed: "Futura-Medium")
         tryAgainLabel.fontSize = 30
         tryAgainLabel.fontColor = SKColor.whiteColor()
         tryAgainLabel.position = CGPoint(x: self.size.width / 2, y: 50)
