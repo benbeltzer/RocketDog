@@ -174,17 +174,30 @@ class GameScene: SKScene {
         }
     }
     
+    // addLaser: play laser sound and shoot a laser node from the player's ship
+    func addLaser() {
+        
+        if let laserSoundURL = NSBundle.mainBundle().URLForResource("laser", withExtension: "wav") {
+            let laserSound = SKAudioNode(URL: laserSoundURL)
+            laserSound.autoplayLooped = false
+            laserSound.runAction(SKAction.changeVolumeTo(0.2, duration: 0))
+            laserSound.runAction(SKAction.play())
+            addChild(laserSound)
+        }
+        
+        let laser = LaserNode()
+        laser.position = player.position
+        foreground.addChild(laser)
+        laser.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 50))
+    }
+    
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         
         // If already started ignore touches
         if (player.physicsBody!.dynamic && player.type == .Normal) {
             return
         } else if (player.type == .Laser) {
-            runAction(SKAction.playSoundFileNamed("explosion.wav", waitForCompletion: false))
-            let laser = LaserNode()
-            laser.position = player.position
-            foreground.addChild(laser)
-            laser.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 50))
+            addLaser()
             return
         }
         
