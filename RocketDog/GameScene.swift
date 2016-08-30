@@ -61,11 +61,12 @@ class GameScene: SKScene {
         gameOver = false
         
         // Setup Background
-        background = createBackground(0, reflected: backgroundReflected)
+        background = createBackground(0)
         background.zPosition = 0
         addChild(background)
-        backgroundHeight = 64.0 * scaleFactor * 20
-        backgroundImageHeight = 64.0 * scaleFactor * 20
+        // background moves at 10% speed of foreground, so divide by 0.1
+        backgroundImageHeight = (64.0 * scaleFactor * 20) / 0.1
+        backgroundHeight = backgroundImageHeight
         
         // Setup Midground
         midground = createMidground()
@@ -166,9 +167,10 @@ class GameScene: SKScene {
         }
         
         // Check if we need to reload background
-        if (player.position.y > backgroundHeight - self.size.height - 50) {
+        // Divide height by 0.1 because background moves at 10% speed of foreground
+        if (player.position.y > backgroundHeight - self.size.height / 0.1) {
             backgroundHeight = backgroundHeight + backgroundImageHeight
-            let newBackground = createBackground(Int(backgroundHeight / backgroundImageHeight) - 1, reflected: backgroundReflected)
+            let newBackground = createBackground(Int(backgroundHeight / backgroundImageHeight) - 1)
             newBackground.zPosition = 0
             background.addChild(newBackground)
         }
@@ -226,7 +228,7 @@ class GameScene: SKScene {
     
     // MARK: Node Creating
     
-    func createBackground(offset: Int, reflected: Bool) -> SKNode {
+    func createBackground(offset: Int) -> SKNode {
         
         let background = SKNode()
         let ySpacing = 64.0 * scaleFactor // image dimension in pixels
