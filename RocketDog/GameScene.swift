@@ -183,13 +183,8 @@ class GameScene: SKScene {
     // addLaser: play laser sound and shoot a laser node from the player's ship
     func addLaser() {
         
-        if let laserSoundURL = NSBundle.mainBundle().URLForResource("laser", withExtension: "wav") {
-            let laserSound = SKAudioNode(URL: laserSoundURL)
-            laserSound.autoplayLooped = false
-            laserSound.runAction(SKAction.changeVolumeTo(0.2, duration: 0))
-            laserSound.runAction(SKAction.play())
-            addChild(laserSound)
-        }
+        let laserSound = SKAction.playSoundFileNamed("laser.wav", waitForCompletion: false)
+        runAction(laserSound)
         
         let laser = LaserNode()
         laser.position = player.position
