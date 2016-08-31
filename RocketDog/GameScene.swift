@@ -423,7 +423,8 @@ class GameScene: SKScene {
         motionManager.startDeviceMotionUpdatesToQueue(NSOperationQueue.currentQueue()!, withHandler: {
             (motion: CMDeviceMotion?, error: NSError?) in
             if let gravity = motion?.gravity {
-                self.rotation = CGFloat(atan2(gravity.x, gravity.y) - M_PI)
+                // make sure rotation never makes ship look upside down
+                self.rotation = CGFloat(atan2(gravity.x, min(gravity.y, -gravity.y)) + M_PI)
             }
         })
     }
