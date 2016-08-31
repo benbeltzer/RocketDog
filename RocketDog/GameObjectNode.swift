@@ -113,6 +113,18 @@ class GameObjectNode: SKNode {
         }
     }
     
+    func drawPlusScoreLabel(score: Int, atPosition position: CGPoint) {
+        let label = SKLabelNode(fontNamed: "Futura-Medium")
+        label.fontSize = 30
+        label.fontColor = SKColor.whiteColor()
+        label.text = "+\(score)"
+        label.position = position
+        label.zPosition = 3
+        self.parent!.addChild(label)
+        let fade = SKAction.fadeAlphaTo(0, duration: 0.5)
+        label.runAction(fade)
+    }
+    
 }
 
 class AsteroidNode: GameObjectNode {
@@ -288,8 +300,16 @@ class LaserNode: GameObjectNode {
     
     func collisionWithAsteroid(asteroid: AsteroidNode) -> Bool {
         asteroid.addExplosionToObject()
+        let points = (asteroid.type == .Normal) ? 50 : 100
+        drawPlusScoreLabel(points, atPosition: asteroid.position)
         asteroid.removeFromParent()
-        self.removeFromParent()
+
+        if let gameScene = scene as? GameScene {
+            gameScene.extraPoints += points
+        }
+
+        removeFromParent()
+        
         return false
     }
     

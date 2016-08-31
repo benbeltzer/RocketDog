@@ -29,6 +29,8 @@ class GameScene: SKScene {
     var backgroundReflected = false
     
     var levelData: NSDictionary!
+    var levelInterval = 1
+    var extraPoints = 0
     
     // music
     var backgroundMusic: SKAudioNode!
@@ -116,7 +118,7 @@ class GameScene: SKScene {
         }
         
         // Update Score
-        GameState.sharedInstance.score = max(Int(player.position.y) - 160, 0)
+        GameState.sharedInstance.score = max(Int(player.position.y) + extraPoints - 160, 0)
         scoreLabel.text = "\(GameState.sharedInstance.score)"
         
         // Remove past objects
@@ -159,7 +161,9 @@ class GameScene: SKScene {
         
         
         // Check if we should spawn a power up
-        if (random() % 1000) == 0 {
+        if Int(player.position.y) > levelInterval * 1500 {
+            levelInterval += 1
+            // TODO: instead pic random power up and draw more often
             drawPowerUp()
         }
         
