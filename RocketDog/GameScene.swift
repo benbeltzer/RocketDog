@@ -211,6 +211,7 @@ class GameScene: SKScene {
         }
         
         player.physicsBody?.dynamic = true
+//        player.addThrust() // should only happen at launch
     }
     
     override func didSimulatePhysics() {

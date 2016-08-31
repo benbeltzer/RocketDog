@@ -7,13 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		430BBA021D777DEB00736CDA /* AsteroidFire.sks in Resources */ = {isa = PBXBuildFile; fileRef = 430BBA011D777DEB00736CDA /* AsteroidFire.sks */; };
+		430BBA041D777EA300736CDA /* RocketThrust.sks in Resources */ = {isa = PBXBuildFile; fileRef = 430BBA031D777EA300736CDA /* RocketThrust.sks */; };
 		434761261D6E337300C6AFCF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434761251D6E337300C6AFCF /* AppDelegate.swift */; };
 		4347612A1D6E337300C6AFCF /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434761291D6E337300C6AFCF /* GameScene.swift */; };
 		4347612C1D6E337300C6AFCF /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4347612B1D6E337300C6AFCF /* GameViewController.swift */; };
 		4347612F1D6E337300C6AFCF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4347612D1D6E337300C6AFCF /* Main.storyboard */; };
 		434761311D6E337300C6AFCF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 434761301D6E337300C6AFCF /* Assets.xcassets */; };
 		434761341D6E337300C6AFCF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 434761321D6E337300C6AFCF /* LaunchScreen.storyboard */; };
-		4370B5541D739234008D50C2 /* AsteroidFire.sks in Resources */ = {isa = PBXBuildFile; fileRef = 4370B5531D739234008D50C2 /* AsteroidFire.sks */; };
 		437FA4D51D6F9B4E00395C4C /* Assets.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 437FA4D41D6F9B4E00395C4C /* Assets.atlas */; };
 		437FA4D71D6FA36700395C4C /* GameObjectNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 437FA4D61D6FA36700395C4C /* GameObjectNode.swift */; };
 		439D58331D7517E6003D7C68 /* space_background_reflected01.png in Resources */ = {isa = PBXBuildFile; fileRef = 439D580B1D7517E6003D7C68 /* space_background_reflected01.png */; };
@@ -113,6 +114,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		430BBA011D777DEB00736CDA /* AsteroidFire.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = AsteroidFire.sks; sourceTree = "<group>"; };
+		430BBA031D777EA300736CDA /* RocketThrust.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = RocketThrust.sks; sourceTree = "<group>"; };
 		434761221D6E337300C6AFCF /* RocketDog.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RocketDog.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		434761251D6E337300C6AFCF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		434761291D6E337300C6AFCF /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
@@ -121,7 +124,6 @@
 		434761301D6E337300C6AFCF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		434761331D6E337300C6AFCF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		434761351D6E337300C6AFCF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		4370B5531D739234008D50C2 /* AsteroidFire.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = AsteroidFire.sks; sourceTree = "<group>"; };
 		437FA4D41D6F9B4E00395C4C /* Assets.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = Assets.atlas; sourceTree = "<group>"; };
 		437FA4D61D6FA36700395C4C /* GameObjectNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameObjectNode.swift; sourceTree = "<group>"; };
 		439D580B1D7517E6003D7C68 /* space_background_reflected01.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = space_background_reflected01.png; sourceTree = "<group>"; };
@@ -231,6 +233,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		430BBA001D777A9900736CDA /* Particle Files */ = {
+			isa = PBXGroup;
+			children = (
+				43FC68611D70D03600A84272 /* spark.sks */,
+				43E9B9E01D73DF90003C7C6E /* spark.png */,
+				43FC68671D70D9DC00A84272 /* fire.sks */,
+				430BBA031D777EA300736CDA /* RocketThrust.sks */,
+				430BBA011D777DEB00736CDA /* AsteroidFire.sks */,
+				43FC68631D70D05F00A84272 /* smoke.sks */,
+			);
+			name = "Particle Files";
+			sourceTree = "<group>";
+		};
 		434761191D6E337300C6AFCF = {
 			isa = PBXGroup;
 			children = (
@@ -255,15 +270,11 @@
 				43FC68751D711D3300A84272 /* EndGameScene.swift */,
 				43FC686F1D71175A00A84272 /* GameState.swift */,
 				437FA4D61D6FA36700395C4C /* GameObjectNode.swift */,
-				43FC68611D70D03600A84272 /* spark.sks */,
-				43E9B9E01D73DF90003C7C6E /* spark.png */,
-				43FC68671D70D9DC00A84272 /* fire.sks */,
-				4370B5531D739234008D50C2 /* AsteroidFire.sks */,
-				43FC68631D70D05F00A84272 /* smoke.sks */,
 				4347612B1D6E337300C6AFCF /* GameViewController.swift */,
 				4347612D1D6E337300C6AFCF /* Main.storyboard */,
 				434761321D6E337300C6AFCF /* LaunchScreen.storyboard */,
 				434761301D6E337300C6AFCF /* Assets.xcassets */,
+				430BBA001D777A9900736CDA /* Particle Files */,
 				43FC686A1D70DDDE00A84272 /* Sounds */,
 				435461A41D6E653C00B289CE /* Graphics */,
 				43E9B9CC1D73C7BE003C7C6E /* Resources */,
@@ -453,6 +464,7 @@
 				43FD0B9E1D6E7E1900DBB23C /* space_background10@2x.png in Resources */,
 				43FD0B9D1D6E7E1900DBB23C /* space_background09@2x.png in Resources */,
 				439D584A1D7517E6003D7C68 /* space_background_reflected12@2x.png in Resources */,
+				430BBA021D777DEB00736CDA /* AsteroidFire.sks in Resources */,
 				439D58401D7517E6003D7C68 /* space_background_reflected07@2x.png in Resources */,
 				43FD0BA61D6E7E1900DBB23C /* space_background18@2x.png in Resources */,
 				439D58431D7517E6003D7C68 /* space_background_reflected09.png in Resources */,
@@ -461,7 +473,6 @@
 				439D583F1D7517E6003D7C68 /* space_background_reflected07.png in Resources */,
 				43FD0BCB1D6E7FA100DBB23C /* space_background15.png in Resources */,
 				439D583E1D7517E6003D7C68 /* space_background_reflected06@2x.png in Resources */,
-				4370B5541D739234008D50C2 /* AsteroidFire.sks in Resources */,
 				439D58481D7517E6003D7C68 /* space_background_reflected11@2x.png in Resources */,
 				439D58341D7517E6003D7C68 /* space_background_reflected01@2x.png in Resources */,
 				43FD0B991D6E7E1900DBB23C /* space_background05@2x.png in Resources */,
@@ -482,6 +493,7 @@
 				439D58361D7517E6003D7C68 /* space_background_reflected02@2x.png in Resources */,
 				439D58421D7517E6003D7C68 /* space_background_reflected08@2x.png in Resources */,
 				43FD0B9C1D6E7E1900DBB23C /* space_background08@2x.png in Resources */,
+				430BBA041D777EA300736CDA /* RocketThrust.sks in Resources */,
 				43FD0BBD1D6E7FA100DBB23C /* space_background01.png in Resources */,
 				43FD0BBF1D6E7FA100DBB23C /* space_background03.png in Resources */,
 				439D58531D7517E6003D7C68 /* space_background_reflected17.png in Resources */,

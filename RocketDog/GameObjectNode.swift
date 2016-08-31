@@ -162,6 +162,7 @@ class ShipNode: GameObjectNode {
     
     var type: ShipType!
     var extraPowerUpTime = 0
+    var height: CGFloat!
     
     init(type: ShipType) {
         super.init()
@@ -172,17 +173,18 @@ class ShipNode: GameObjectNode {
         
         switch type {
         case .Normal:
-            sprite = SKSpriteNode(imageNamed: "blueRocket")
+            sprite = SKSpriteNode(imageNamed: "blueShip")
             physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
             physicsBody?.categoryBitMask = CollisionCategoryBitMask.Player
             physicsBody?.contactTestBitMask = CollisionCategoryBitMask.Asteroid | CollisionCategoryBitMask.PowerUp
         case .Laser:
-            sprite = SKSpriteNode(imageNamed: "redRocket")
+            sprite = SKSpriteNode(imageNamed: "redShip")
             physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
             physicsBody?.categoryBitMask = CollisionCategoryBitMask.PowerUp
             physicsBody?.contactTestBitMask = CollisionCategoryBitMask.Asteroid
         }
         addChild(sprite)
+        height = sprite.size.height
         
         physicsBody?.dynamic = false
         physicsBody?.allowsRotation = false
@@ -208,7 +210,7 @@ class ShipNode: GameObjectNode {
         self.removeFromParent()
         
         player.removeAllChildren()
-        let sprite = SKSpriteNode(imageNamed: "redRocket")
+        let sprite = SKSpriteNode(imageNamed: "redShip")
         player.addChild(sprite)
         (player as! ShipNode).type = .Laser
         (player as! ShipNode).extraPowerUpTime += 1
@@ -229,7 +231,7 @@ class ShipNode: GameObjectNode {
             return
         } else if extraPowerUpTime > 0 {
             removeAllChildren()
-            let sprite = SKSpriteNode(imageNamed: "redRocket")
+            let sprite = SKSpriteNode(imageNamed: "redShip")
             addChild(sprite)
             type = .Laser
             return
@@ -239,17 +241,24 @@ class ShipNode: GameObjectNode {
                 self.removeAllChildren()
                 let sprite: SKSpriteNode!
                 if self.type == .Normal && (interval * 0.9) > 0.05 {
-                    sprite = SKSpriteNode(imageNamed: "redRocket")
+                    sprite = SKSpriteNode(imageNamed: "redShip")
                     self.type = .Laser
                 } else {
-                    sprite = SKSpriteNode(imageNamed: "blueRocket")
+                    sprite = SKSpriteNode(imageNamed: "blueShip")
                     self.type = .Normal
                 }
                 self.addChild(sprite)
                 self.flicker(interval * 0.9)
             })
         }
-        
+    }
+    
+    func addThrust() {
+        let thrustEmitterPath = NSBundle.mainBundle().pathForResource("RocketThrust", ofType: "sks")
+        let thrustEmitter = NSKeyedUnarchiver.unarchiveObjectWithFile(thrustEmitterPath!) as! SKEmitterNode
+        thrustEmitter.position.y -= (height / 2)
+        thrustEmitter.zPosition = 2
+        addChild(thrustEmitter)
     }
     
 }
