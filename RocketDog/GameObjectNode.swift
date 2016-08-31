@@ -51,23 +51,25 @@ class GameObjectNode: SKNode {
         
         // Pulsate Background
         let background = gameScene.background
-        background.runAction(SKAction.scaleTo(1.05, duration: 0.05), completion: {
+        background.runAction(SKAction.scaleTo(1.02, duration: 0.05), completion: {
             background.runAction(SKAction.scaleTo(1, duration: 0.05))
         })
         
         // Shake the scene
-        let move1 = SKAction.moveBy(CGVectorMake(-7, -7), duration: 0.1)
-        let move2 = SKAction.moveBy(CGVectorMake(0, 10), duration: 0.1)
-        let move3 = SKAction.moveBy(CGVectorMake(7, -10), duration: 0.1)
-        let move4 = SKAction.moveBy(CGVectorMake(0, 7), duration: 0.1)
-        let move5 = SKAction.moveBy(CGVectorMake(0, 10), duration: 0.15)
-        let move6 = SKAction.moveBy(CGVectorMake(7, -10), duration: 0.2)
-        let move7 = SKAction.moveBy(CGVectorMake(0, 7), duration: 0.25)
+        let move1 = SKAction.moveBy(CGVectorMake(-3, -3), duration: 0.1)
+        let move2 = SKAction.moveBy(CGVectorMake(0, 5), duration: 0.1)
+        let move3 = SKAction.moveBy(CGVectorMake(3, -5), duration: 0.1)
+        let move4 = SKAction.moveBy(CGVectorMake(0, 3), duration: 0.1)
+        let move5 = SKAction.moveBy(CGVectorMake(0, 5), duration: 0.15)
+        let move6 = SKAction.moveBy(CGVectorMake(3, -5), duration: 0.2)
+        let move7 = SKAction.moveBy(CGVectorMake(0, 3), duration: 0.25)
         
         let shake = SKAction.sequence([move1, move2, move3, move4, move1, move5, move6, move7])
         
         for child in gameScene.children {
-            shakeNode(child, shake: shake)
+            if (child.name != "BACKGROUND" && child.name != "MIDGROUND") {
+                shakeNode(child, shake: shake)
+            }
         }
         
         let fireEmitterPath = NSBundle.mainBundle().pathForResource("fire", ofType: "sks")
