@@ -380,10 +380,9 @@ class GameScene: SKScene {
             (asteroidNode, stop) in
             
             let sprite = asteroidNode.childNodeWithName("ASTEROID")! as! SKSpriteNode
-            let origin = CGPoint(x: asteroidNode.position.x - sprite.size.width / 2,
-                y: asteroidNode.position.y - sprite.size.height / 2)
-            let size = CGSize(width: sprite.size.width * 2, height: sprite.size.height * 2)
-            
+            let origin = CGPoint(x: asteroidNode.position.x - sprite.size.width,
+                y: asteroidNode.position.y + sprite.size.height)
+            let size = CGSize(width: sprite.size.width * 3, height: sprite.size.height * 3)
             let frame = CGRect(origin: origin, size: size)
             
             if (CGRectContainsPoint(frame, node.position)) {
