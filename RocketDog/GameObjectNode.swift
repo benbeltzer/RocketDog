@@ -230,7 +230,7 @@ class ShipNode: GameObjectNode {
         (player as! ShipNode).extraPowerUpTime += 1
         
         if (!(player as! ShipNode).hasSeenLaser) {
-            let point = CGPoint(x: (scene!.size.width / 2), y: 80)
+            let point = CGPoint(x: (scene!.size.width / 2), y: 40)
             let label = makeInstructionLabel("TAP TO SHOOT!", atPosition: point)
             (scene as! GameScene).addChild(label)
             (player as! ShipNode).hasSeenLaser = true

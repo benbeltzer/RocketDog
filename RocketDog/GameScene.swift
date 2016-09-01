@@ -60,7 +60,6 @@ class GameScene: SKScene {
         scaleFactor = self.size.width / 320.0
         
         GameState.sharedInstance.score = 0
-        gameOver = false
         
         // Setup Background
         background = createBackground(0)
@@ -197,7 +196,6 @@ class GameScene: SKScene {
     }
     
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        
         // If already started ignore touches
         if (player.physicsBody!.dynamic && player.type == .Normal) {
             return
@@ -205,7 +203,7 @@ class GameScene: SKScene {
             addLaser()
             return
         }
-        
+    
         initMotionManager()
         tapToStartNode.removeFromParent()
         
@@ -439,8 +437,8 @@ class GameScene: SKScene {
         GameState.sharedInstance.saveState()
         
         let reveal = SKTransition.fadeWithDuration(0.5)
-        let endGameScene = EndGameScene(size: self.size)
-        self.view!.presentScene(endGameScene, transition: reveal)
+        let endScene = EndGameScene(size: self.size)
+        self.view!.presentScene(endScene, transition: reveal)
     }
     
 }
