@@ -177,6 +177,7 @@ class ShipNode: GameObjectNode {
     var type: ShipType!
     var extraPowerUpTime = 0
     var height: CGFloat!
+    var hasSeenLaser = false // determine if we should show instructions
     
     init(type: ShipType) {
         super.init()
@@ -221,15 +222,22 @@ class ShipNode: GameObjectNode {
     override func collisionWithPlayer(player: SKNode) -> Bool {
         // Power Up ship and player collided
 
-        self.removeFromParent()
-        
         player.removeAllChildren()
+        
         let sprite = SKSpriteNode(imageNamed: "redShip")
         player.addChild(sprite)
         (player as! ShipNode).type = .Laser
         (player as! ShipNode).extraPowerUpTime += 1
         
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 10 * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
+        if (!(player as! ShipNode).hasSeenLaser) {
+            let point = CGPoint(x: (scene!.size.width / 2), y: 80)
+            let label = makeInstructionLabel("TAP TO SHOOT!", atPosition: point)
+            (scene as! GameScene).addChild(label)
+            (player as! ShipNode).hasSeenLaser = true
+        }
+        self.removeFromParent()
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
             (player as! ShipNode).extraPowerUpTime -= 1
             if (player as! ShipNode).extraPowerUpTime == 0 {
                 (player as! ShipNode).flicker(0.5)
@@ -273,6 +281,18 @@ class ShipNode: GameObjectNode {
         thrustEmitter.position.y -= (height / 2)
         thrustEmitter.zPosition = 2
         addChild(thrustEmitter)
+    }
+    
+    func makeInstructionLabel(text: String, atPosition point: CGPoint) -> SKLabelNode {
+        let label = SKLabelNode(fontNamed: "Futura-Medium")
+        label.fontSize = 30
+        label.fontColor = SKColor.whiteColor()
+        label.text = text
+        label.position = point
+        label.zPosition = 3
+        let fade = SKAction.fadeAlphaTo(0, duration: 5)
+        label.runAction(fade)
+        return label
     }
     
 }
