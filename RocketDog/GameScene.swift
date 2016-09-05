@@ -80,6 +80,12 @@ class GameScene: SKScene {
         foreground.zPosition = 2
         addChild(foreground)
         
+        // TODO REMOVE THIS! TESTING ONLY!
+        // Add blackhole
+        let node = BlackHoleNode()
+        node.position = CGPoint(x: 160 * scaleFactor, y: 300)
+        foreground.addChild(node)
+        
         // HUD
         hud = SKNode()
         hud.name = "HUD"
@@ -213,10 +219,14 @@ class GameScene: SKScene {
         }
         
         player.physicsBody?.dynamic = true
-//        player.addThrust() // should only happen at launch
+        player.addThrust() // should only happen at launch
     }
     
     override func didSimulatePhysics() {
+        if (!player.simulatePhysics) {
+            return
+        }
+        
         player.physicsBody?.velocity.dx = xAcceleration * 400.0
         player.zRotation = self.rotation
         

@@ -14,6 +14,7 @@ struct CollisionCategoryBitMask {
     static let Asteroid: UInt32 = 0x01
     static let PowerUp: UInt32 = 0x02
     static let Laser: UInt32 = 0x03
+    static let BlackHole: UInt32 = 0x04
 }
 
 enum AsteroidType: Int {
@@ -138,19 +139,19 @@ class AsteroidNode: GameObjectNode {
         
         let sprite = SKSpriteNode(imageNamed: "asteroid")
         sprite.name = "ASTEROID"
-        self.physicsBody = SKPhysicsBody(circleOfRadius: sprite.size.width / 2)
-        self.addChild(sprite)
+        physicsBody = SKPhysicsBody(circleOfRadius: sprite.size.width / 2)
+        addChild(sprite)
 
         if type == .Moving {
-            self.physicsBody?.dynamic = true
-            self.name = "MOVING_ASTEROID"
+            physicsBody?.dynamic = true
+            name = "MOVING_ASTEROID"
         } else {
-            self.physicsBody?.dynamic = false
-            self.name = "NORMAL_ASTEROID"
+            physicsBody?.dynamic = false
+            name = "NORMAL_ASTEROID"
         }
         
-        self.physicsBody?.categoryBitMask = CollisionCategoryBitMask.Asteroid
-        self.physicsBody?.collisionBitMask = 0
+        physicsBody?.categoryBitMask = CollisionCategoryBitMask.Asteroid
+        physicsBody?.collisionBitMask = 0
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -178,6 +179,7 @@ class ShipNode: GameObjectNode {
     var extraPowerUpTime = 0
     var height: CGFloat!
     var hasSeenLaser = false // determine if we should show instructions
+    var simulatePhysics = true
     
     init(type: ShipType) {
         super.init()
@@ -191,12 +193,12 @@ class ShipNode: GameObjectNode {
             sprite = SKSpriteNode(imageNamed: "blueShip")
             physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
             physicsBody?.categoryBitMask = CollisionCategoryBitMask.Player
-            physicsBody?.contactTestBitMask = CollisionCategoryBitMask.Asteroid | CollisionCategoryBitMask.PowerUp
+            physicsBody?.contactTestBitMask = CollisionCategoryBitMask.Asteroid | CollisionCategoryBitMask.PowerUp | CollisionCategoryBitMask.BlackHole
         case .Laser:
             sprite = SKSpriteNode(imageNamed: "redShip")
             physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
             physicsBody?.categoryBitMask = CollisionCategoryBitMask.PowerUp
-            physicsBody?.contactTestBitMask = CollisionCategoryBitMask.Asteroid
+            physicsBody?.contactTestBitMask = CollisionCategoryBitMask.Asteroid | CollisionCategoryBitMask.BlackHole
         }
         addChild(sprite)
         height = sprite.size.height
@@ -299,23 +301,23 @@ class ShipNode: GameObjectNode {
 
 class LaserNode: GameObjectNode {
    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+    
     override init() {
         super.init()
         
-        self.name = "LASER"
+        name = "LASER"
         
         let sprite = SKSpriteNode(imageNamed: "laser")
-        self.physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
-        self.addChild(sprite)
+        physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
+        addChild(sprite)
         
-        self.physicsBody?.categoryBitMask = CollisionCategoryBitMask.Laser
-        self.physicsBody?.contactTestBitMask = CollisionCategoryBitMask.Asteroid
-        self.physicsBody?.collisionBitMask = 0
-        self.physicsBody?.usesPreciseCollisionDetection = true
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+        physicsBody?.categoryBitMask = CollisionCategoryBitMask.Laser
+        physicsBody?.contactTestBitMask = CollisionCategoryBitMask.Asteroid
+        physicsBody?.collisionBitMask = 0
+        physicsBody?.usesPreciseCollisionDetection = true
     }
     
     func collisionWithAsteroid(asteroid: AsteroidNode) -> Bool {
@@ -341,3 +343,51 @@ class LaserNode: GameObjectNode {
         }
     }
 }
+
+class BlackHoleNode: GameObjectNode {
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+    
+    override init() {
+        super.init()
+        
+        name = "BLACKHOLE"
+        
+        let sprite = SKSpriteNode(imageNamed: "blackHole")
+        physicsBody = SKPhysicsBody(circleOfRadius: sprite.size.width / 2)
+        addChild(sprite)
+        
+        physicsBody?.dynamic = false
+        physicsBody?.categoryBitMask = CollisionCategoryBitMask.BlackHole
+        physicsBody?.collisionBitMask = 0
+    }
+    
+    override func collisionWithPlayer(player: SKNode) -> Bool {
+        
+        (player as! ShipNode).simulatePhysics = false // do not use accelerometer to set ship rotation
+        // Spin and shrink ship as it enters black hole
+        player.runAction(SKAction.moveTo(position, duration: 1))
+        player.runAction(SKAction.rotateByAngle(CGFloat(M_PI * 2), duration: 1))
+        player.runAction(SKAction.scaleTo(0.1, duration: 1), completion: {
+            player.removeFromParent()
+            guard let gameScene = self.scene as? GameScene else {
+                return
+            }
+            gameScene.endGame()
+        })
+        
+        return false
+    }
+    
+}
+
+
+
+
+
+
+
+
+
