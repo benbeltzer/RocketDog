@@ -28,7 +28,6 @@ class GameScene: SKScene {
     var backgroundImageHeight: CGFloat!
     var backgroundReflected = false
     
-    var levelData: NSDictionary!
     var levelInterval = 1
     var extraPoints = 0
     
@@ -80,12 +79,6 @@ class GameScene: SKScene {
         foreground.zPosition = 2
         addChild(foreground)
         
-        // TODO REMOVE THIS! TESTING ONLY!
-        // Add blackhole
-        let node = BlackHoleNode()
-        node.position = CGPoint(x: 160 * scaleFactor, y: 300)
-        foreground.addChild(node)
-        
         // HUD
         hud = SKNode()
         hud.name = "HUD"
@@ -93,8 +86,6 @@ class GameScene: SKScene {
         addChild(hud)
         
         // Load level
-        let levelPlist = NSBundle.mainBundle().pathForResource("Level_Singles", ofType: "plist")
-        levelData = NSDictionary(contentsOfFile: levelPlist!)!
         drawAsteroids(startingAt: 400)
         
         // Player
@@ -163,7 +154,6 @@ class GameScene: SKScene {
             maxLevelY += 1000
             drawAsteroids(startingAt: maxLevelY - 1000)
         }
-        
         
         // Check if we should spawn a power up
         if Int(player.position.y) > levelInterval * 1500 {
@@ -301,7 +291,6 @@ class GameScene: SKScene {
     
     func createHUD() {
 
-        // TODO: Change this dumb font
         scoreLabel = SKLabelNode(fontNamed: "Futura-Medium")
         scoreLabel.fontSize = 30
         scoreLabel.fontColor = SKColor.whiteColor()
@@ -313,59 +302,33 @@ class GameScene: SKScene {
     }
     
     // For creating stationary asteroids
-    func drawAsteroidAtPosition(position: CGPoint, ofType type: AsteroidType) -> AsteroidNode {
-        
+    func createAsteroidAtPosition(position: CGPoint, ofType type: AsteroidType) -> AsteroidNode {
         let node = AsteroidNode(type: type)
         node.position = CGPoint(x: position.x * scaleFactor, y: position.y)
-        
         return node
     }
     
-    // Draw pattern at location and return max y height
-    func drawPattern(pattern: [NSDictionary], patternX: CGFloat, patternY: CGFloat) -> CGFloat {
-
-        var maxY: CGFloat = 0
-        
-        for asteroidPoint in pattern {
-            let x = asteroidPoint["x"]?.floatValue
-            let y = asteroidPoint["y"]?.floatValue
-            let positionX = CGFloat(x!) + patternX
-            let positionY = CGFloat(y!) + patternY
-            
-            let asteroidNode = drawAsteroidAtPosition(CGPoint(x: positionX, y: positionY), ofType: .Normal)
-            foreground.addChild(asteroidNode)
-            maxY = (positionY > maxY) ? positionY : maxY
-        }
-        
-        return maxY
-    }
-    
     func drawAsteroids(startingAt y: CGFloat) {
-        let patterns = (levelData["Asteroids"] as! NSDictionary)["Patterns"] as! NSDictionary
-        let numPatterns = patterns.count
-        var pattern: [NSDictionary]!
         var currentY = y
-        var nextY: CGFloat!
         var xPosition: CGFloat!
         var r = 0
         
         while (currentY < maxLevelY) {
-            // Get random pattern
             r = random()
-            pattern = patterns.allValues[r % numPatterns] as! [NSDictionary]
+
+            // Get random xPosition between 0 and self.size.width - 30
+            xPosition = (CGFloat(r) % (self.size.width - 30))
             
-            // Get rancdom xPosition between 30 and self.size.width - 30
-            xPosition = (CGFloat(r) % (self.size.width - 60)) + 30
-            
-            nextY = drawPattern(pattern, patternX: xPosition, patternY: currentY)
-            currentY = nextY + 100
+            let asteroid = createAsteroidAtPosition(CGPoint(x: xPosition, y: currentY), ofType: .Normal)
+            foreground.addChild(asteroid)
+            currentY += 100
         }
     }
     
     func drawMovingAsteroid() {
         let r = random()
         let xPosition = CGFloat(r) % self.size.width
-        let asteroid = drawAsteroidAtPosition(CGPoint(x: xPosition, y: player.position.y + self.size.height), ofType: .Moving)
+        let asteroid = createAsteroidAtPosition(CGPoint(x: xPosition, y: player.position.y + self.size.height), ofType: .Moving)
         foreground.addChild(asteroid)
 
         // Get random dx between -5 and 5, random dy between -15 and -5
