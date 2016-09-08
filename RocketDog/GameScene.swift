@@ -354,7 +354,7 @@ class GameScene: SKScene {
     }
 
     // If a node is near an asteroid, it will move it over
-    func checkForIntersectionWithAsteroid(node: GameObjectNode) -> GameObjectNode {
+    func checkForIntersectionWithObjects(node: GameObjectNode) -> GameObjectNode {
         foreground.enumerateChildNodesWithName("*", usingBlock: {
             (child, stop) in
             
@@ -379,7 +379,7 @@ class GameScene: SKScene {
         let yPosition = player.position.y + self.size.height
         
         node.position = CGPoint(x: xPosition * scaleFactor, y: yPosition)
-        let modifiedNode = checkForIntersectionWithAsteroid(node)
+        let modifiedNode = checkForIntersectionWithObjects(node)
         foreground.addChild(modifiedNode)
     }
     
