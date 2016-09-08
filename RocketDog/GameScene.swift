@@ -29,6 +29,7 @@ class GameScene: SKScene {
     var backgroundReflected = false
     
     var levelInterval = 1
+    var blackHoleInterval = 1
     var extraPoints = 0
     
     // music
@@ -91,6 +92,7 @@ class GameScene: SKScene {
         // Player
         player = createPlayer()
         player.name = "PLAYER"
+        player.zPosition = 3
         foreground.addChild(player)
         
         // Tap to Start
@@ -155,11 +157,17 @@ class GameScene: SKScene {
             drawAsteroids(startingAt: maxLevelY - 1000)
         }
         
-        // Check if we should spawn a power up
+        // Draw black hole at distance intervals of 500
+        if Int(player.position.y) > blackHoleInterval * 500 {
+            blackHoleInterval += 1
+            drawSpecialNode(BlackHoleNode())
+        }
+        
+        // Draw an power up at distance intervals of 1500
         if Int(player.position.y) > levelInterval * 1500 {
             levelInterval += 1
-            // TODO: instead pic random power up and draw more often
-            drawPowerUp()
+            // TODO: instead pic random power up and draw more often !!!!!
+            drawSpecialNode(ShipNode(type: .Laser))
         }
         
         // Check if we should add a flying asteroid
@@ -347,33 +355,32 @@ class GameScene: SKScene {
 
     // If a node is near an asteroid, it will move it over
     func checkForIntersectionWithAsteroid(node: GameObjectNode) -> GameObjectNode {
-        foreground.enumerateChildNodesWithName("NORMAL_ASTEROID", usingBlock: {
-            (asteroidNode, stop) in
+        foreground.enumerateChildNodesWithName("*", usingBlock: {
+            (child, stop) in
             
-            let sprite = asteroidNode.childNodeWithName("ASTEROID")! as! SKSpriteNode
-            let origin = CGPoint(x: asteroidNode.position.x - sprite.size.width,
-                y: asteroidNode.position.y + sprite.size.height)
-            let size = CGSize(width: sprite.size.width * 3, height: sprite.size.height * 3)
-            let frame = CGRect(origin: origin, size: size)
-            
-            if (CGRectContainsPoint(frame, node.position)) {
-                node.position.x = ((node.position.x + 50) % (self.size.width - 60)) + 30
-                stop.memory = true
+            if ((child.name != nil) && (child.name != "PLAYER")) {
+                let origin = CGPoint(x: child.position.x - 100, y: child.position.y - 100)
+                let size = CGSize(width: 200, height: 200)
+                let frame = CGRect(origin: origin, size: size)
+
+                if (CGRectContainsPoint(frame, node.position)) {
+                    node.position.x = ((node.position.x + 150) % (self.size.width - 30)) + 10
+                    stop.memory = true
+                }
             }
         })
         return node
     }
-    
-    func drawPowerUp() {
-        // TODO: For now pick a LaserShip, later we will choose random power up from plist
-        // plist will just store a list of power up types, or use an enum in gameobjectnode
+
+    // TODO: For now pick a LaserShip, later we will choose random power up from plist
+    // plist will just store a list of power up types, or use an enum in gameobjectnode
+    func drawSpecialNode(node: GameObjectNode) {
         let xPosition = (CGFloat(random()) % (self.size.width - 60)) + 30
-        let yPosition = player.position.y + self.size.height + 100
+        let yPosition = player.position.y + self.size.height
         
-        var node = ShipNode(type: .Laser)
         node.position = CGPoint(x: xPosition * scaleFactor, y: yPosition)
-        node = checkForIntersectionWithAsteroid(node) as! ShipNode
-        foreground.addChild(node)
+        let modifiedNode = checkForIntersectionWithAsteroid(node)
+        foreground.addChild(modifiedNode)
     }
     
     // MARK: Motion Manager Setup
