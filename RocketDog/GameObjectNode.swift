@@ -234,10 +234,11 @@ class ShipNode: GameObjectNode {
 
         player.removeAllChildren()
         
-        let sprite: SKSpriteNode!
+        var sprite: SKSpriteNode!
 
         if type == .Laser {
             sprite = SKSpriteNode(imageNamed: "redShip")
+            player.addChild(sprite)
             (player as! ShipNode).type = .Laser
             
             if (!(player as! ShipNode).hasSeenLaser) {
@@ -250,10 +251,17 @@ class ShipNode: GameObjectNode {
         } else {
             // Boost Ship. Power up ship will never be normal type
             sprite = SKSpriteNode(imageNamed: "orangeShip")
+            player.addChild(sprite)
             (player as! ShipNode).type = .Boost
+            
             // TODO: Call Boost Ship Method!!!
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
+                player.removeAllChildren()
+                sprite = SKSpriteNode(imageNamed: "blueShip")
+                player.addChild(sprite)
+                (player as! ShipNode).type = .Normal
+            })
         }
-        player.addChild(sprite)
 
         removeFromParent()
         

@@ -489,7 +489,7 @@ extension GameScene: SKPhysicsContactDelegate {
             // Collision between player and something
             let nonPlayerNode = (contact.bodyA.node != player) ? contact.bodyA.node : contact.bodyB.node
             if let other = nonPlayerNode as? GameObjectNode {
-                if ((other as? ShipNode) != nil) {
+                if let ship = (other as? ShipNode) where ship.type == .Laser {
                     createLaserBar()
                 }
                 updateHUD = other.collisionWithPlayer(player)
