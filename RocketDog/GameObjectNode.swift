@@ -200,7 +200,7 @@ class ShipNode: GameObjectNode {
             physicsBody?.categoryBitMask = CollisionCategoryBitMask.PowerUp
             physicsBody?.contactTestBitMask = CollisionCategoryBitMask.Asteroid | CollisionCategoryBitMask.BlackHole
         case .Boost:
-            sprite = SKSpriteNode(imageNamed: "orange")
+            sprite = SKSpriteNode(imageNamed: "orangeShip")
             physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
             physicsBody?.categoryBitMask = CollisionCategoryBitMask.PowerUp
         }
