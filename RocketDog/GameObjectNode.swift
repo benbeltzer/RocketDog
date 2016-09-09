@@ -239,42 +239,7 @@ class ShipNode: GameObjectNode {
         }
         self.removeFromParent()
         
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
-            (player as! ShipNode).extraPowerUpTime -= 1
-            if (player as! ShipNode).extraPowerUpTime == 0 {
-                (player as! ShipNode).flicker(0.5)
-            }
-        })
-        
         return false
-    }
-    
-    // Ship flickers between special and normal as time runs out
-    func flicker(interval: CGFloat) {
-        if (interval <= 0.05) {
-            return
-        } else if extraPowerUpTime > 0 {
-            removeAllChildren()
-            let sprite = SKSpriteNode(imageNamed: "redShip")
-            addChild(sprite)
-            type = .Laser
-            return
-        } else {
-            let waitTime = Int64(CGFloat(NSEC_PER_SEC) * interval)
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, waitTime), dispatch_get_main_queue(), {
-                self.removeAllChildren()
-                let sprite: SKSpriteNode!
-                if self.type == .Normal && (interval * 0.9) > 0.05 {
-                    sprite = SKSpriteNode(imageNamed: "redShip")
-                    self.type = .Laser
-                } else {
-                    sprite = SKSpriteNode(imageNamed: "blueShip")
-                    self.type = .Normal
-                }
-                self.addChild(sprite)
-                self.flicker(interval * 0.9)
-            })
-        }
     }
     
     func addThrust() {

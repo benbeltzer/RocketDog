@@ -31,6 +31,7 @@ class GameScene: SKScene {
     var levelInterval = 1
     var blackHoleInterval = 1
     var extraPoints = 0
+    var laserBar: SKShapeNode!
     
     // music
     var backgroundMusic: SKAudioNode!
@@ -157,6 +158,13 @@ class GameScene: SKScene {
             drawAsteroids(startingAt: maxLevelY - 1000)
         }
         
+        // Check if we should add a flying asteroid
+        if (player.physicsBody!.dynamic) {
+            if (random() % 150) == 0 {
+                drawMovingAsteroid()
+            }
+        }
+        
         // Draw black hole at distance intervals of 500
         if Int(player.position.y) > blackHoleInterval * 500 {
             blackHoleInterval += 1
@@ -170,13 +178,6 @@ class GameScene: SKScene {
             drawSpecialNode(ShipNode(type: .Laser))
         }
         
-        // Check if we should add a flying asteroid
-        if (player.physicsBody!.dynamic) {
-            if (random() % 150) == 0 {
-                drawMovingAsteroid()
-            }
-        }
-        
         // Check if we need to reload background
         // Divide height by 0.1 because background moves at 10% speed of foreground
         if (player.position.y > backgroundHeight - self.size.height / 0.1) {
@@ -184,6 +185,37 @@ class GameScene: SKScene {
             let newBackground = createBackground(Int(backgroundHeight / backgroundImageHeight) - 1)
             newBackground.zPosition = 0
             background.addChild(newBackground)
+        }
+    }
+    
+    func createLaserBar() {
+        if (laserBar == nil) {
+            laserBar = SKShapeNode(path: CGPathCreateWithRoundedRect(CGRect(x: 0, y: 0, width: 50, height: 15), 5, 5, nil))
+            laserBar.strokeColor = .blackColor()
+            laserBar.fillColor = .redColor()
+            laserBar.position = CGPoint(x: 10, y: self.size.height - 20)
+            laserBar.zPosition = 10
+            laserBar.name = "LASER_BAR"
+            addChild(laserBar)
+        } else {
+            laserBar.xScale = 1
+            if laserBar.parent == nil {
+                addChild(laserBar)
+            }
+        }
+    }
+    
+    func shrinkLaserBar() {
+        if (laserBar != nil) {
+            laserBar.xScale -= 0.02
+            if laserBar.xScale <= 0 {
+                laserBar.removeFromParent()
+                
+                // swap ship
+                player.removeAllChildren()
+                player.type = .Normal
+                player.addChild(SKSpriteNode(imageNamed: "blueShip"))
+            }
         }
     }
     
@@ -199,6 +231,7 @@ class GameScene: SKScene {
         laser.zRotation = player.zRotation
         foreground.addChild(laser)
         laser.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 50))
+        shrinkLaserBar()
     }
     
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
@@ -451,6 +484,9 @@ extension GameScene: SKPhysicsContactDelegate {
             // Collision between player and something
             let nonPlayerNode = (contact.bodyA.node != player) ? contact.bodyA.node : contact.bodyB.node
             if let other = nonPlayerNode as? GameObjectNode {
+                if ((other as? ShipNode) != nil) {
+                    createLaserBar()
+                }
                 updateHUD = other.collisionWithPlayer(player)
             }
         }
