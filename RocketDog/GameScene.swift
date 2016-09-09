@@ -195,6 +195,8 @@ class GameScene: SKScene {
         
         let laser = LaserNode()
         laser.position = player.position
+        laser.physicsBody?.velocity.dx = (player.physicsBody?.velocity.dx)! * 2
+        laser.zRotation = player.zRotation
         foreground.addChild(laser)
         laser.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 50))
     }
@@ -430,13 +432,19 @@ extension GameScene: SKPhysicsContactDelegate {
 
         if (contact.bodyA.node != player && contact.bodyB.node != player) {
             
-            // Collision between laser and asteroid
+            // Collision between laser and something
             if let asteroid = contact.bodyA.node as? AsteroidNode,
                 laser = (contact.bodyB.node as? LaserNode) {
                 updateHUD = laser.collisionWithAsteroid(asteroid)
             } else if let asteroid = contact.bodyB.node as? AsteroidNode,
                 laser = contact.bodyA.node as? LaserNode {
                 updateHUD = laser.collisionWithAsteroid(asteroid)
+            } else if let laser = contact.bodyA.node as? LaserNode,
+                blackHole = contact.bodyB.node as? BlackHoleNode {
+                blackHole.collisionWithLaser(laser)
+            } else if let blackHole = contact.bodyA.node as? BlackHoleNode,
+                laser = contact.bodyB.node as? LaserNode {
+                blackHole.collisionWithLaser(laser)
             }
             
         } else {

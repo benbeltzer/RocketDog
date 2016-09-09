@@ -315,7 +315,7 @@ class LaserNode: GameObjectNode {
         addChild(sprite)
         
         physicsBody?.categoryBitMask = CollisionCategoryBitMask.Laser
-        physicsBody?.contactTestBitMask = CollisionCategoryBitMask.Asteroid
+        physicsBody?.contactTestBitMask = (CollisionCategoryBitMask.Asteroid | CollisionCategoryBitMask.BlackHole)
         physicsBody?.collisionBitMask = 0
         physicsBody?.usesPreciseCollisionDetection = true
     }
@@ -367,7 +367,11 @@ class BlackHoleNode: GameObjectNode {
     override func collisionWithPlayer(player: SKNode) -> Bool {
         
         (player as! ShipNode).simulatePhysics = false // do not use accelerometer to set ship rotation
+
         // Spin and shrink ship as it enters black hole
+        let fallSound = SKAction.playSoundFileNamed("fall.wav", waitForCompletion: false)
+        runAction(fallSound)
+
         player.runAction(SKAction.moveTo(position, duration: 1))
         player.runAction(SKAction.rotateByAngle(CGFloat(M_PI * 2), duration: 1))
         player.runAction(SKAction.scaleTo(0.1, duration: 1), completion: {
@@ -376,6 +380,17 @@ class BlackHoleNode: GameObjectNode {
                 return
             }
             gameScene.endGame()
+        })
+        
+        return false
+    }
+    
+    func collisionWithLaser(laser: LaserNode) -> Bool {
+        
+        laser.runAction(SKAction.moveTo(position, duration: 1))
+        laser.runAction(SKAction.rotateByAngle(CGFloat(M_PI * 2), duration: 1))
+        laser.runAction(SKAction.scaleTo(0.1, duration: 1), completion: {
+            laser.removeFromParent()
         })
         
         return false
