@@ -25,6 +25,7 @@ enum AsteroidType: Int {
 enum ShipType: Int {
     case Normal = 0
     case Laser
+    case Boost
 }
 
 class GameObjectNode: SKNode {
@@ -176,7 +177,6 @@ class AsteroidNode: GameObjectNode {
 class ShipNode: GameObjectNode {
     
     var type: ShipType!
-    var extraPowerUpTime = 0
     var height: CGFloat!
     var hasSeenLaser = false // determine if we should show instructions
     var simulatePhysics = true
@@ -199,6 +199,10 @@ class ShipNode: GameObjectNode {
             physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
             physicsBody?.categoryBitMask = CollisionCategoryBitMask.PowerUp
             physicsBody?.contactTestBitMask = CollisionCategoryBitMask.Asteroid | CollisionCategoryBitMask.BlackHole
+        case .Boost:
+            sprite = SKSpriteNode(imageNamed: "orange")
+            physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
+            physicsBody?.categoryBitMask = CollisionCategoryBitMask.PowerUp
         }
         addChild(sprite)
         height = sprite.size.height
@@ -226,18 +230,28 @@ class ShipNode: GameObjectNode {
 
         player.removeAllChildren()
         
-        let sprite = SKSpriteNode(imageNamed: "redShip")
-        player.addChild(sprite)
-        (player as! ShipNode).type = .Laser
-        (player as! ShipNode).extraPowerUpTime += 1
-        
-        if (!(player as! ShipNode).hasSeenLaser) {
-            let point = CGPoint(x: (scene!.size.width / 2), y: 40)
-            let label = makeInstructionLabel("TAP TO SHOOT!", atPosition: point)
-            (scene as! GameScene).addChild(label)
-            (player as! ShipNode).hasSeenLaser = true
+        let sprite: SKSpriteNode!
+
+        if type == .Laser {
+            sprite = SKSpriteNode(imageNamed: "redShip")
+            (player as! ShipNode).type = .Laser
+            
+            if (!(player as! ShipNode).hasSeenLaser) {
+                let point = CGPoint(x: (scene!.size.width / 2), y: 40)
+                let label = makeInstructionLabel("TAP TO SHOOT!", atPosition: point)
+                (scene as! GameScene).addChild(label)
+                (player as! ShipNode).hasSeenLaser = true
+            }
+
+        } else {
+            // Boost Ship. Power up ship will never be normal type
+            sprite = SKSpriteNode(imageNamed: "orangeShip")
+            (player as! ShipNode).type = .Boost
+            // TODO: Call Boost Ship Method!!!
         }
-        self.removeFromParent()
+        player.addChild(sprite)
+
+        removeFromParent()
         
         return false
     }

@@ -108,6 +108,11 @@ class GameScene: SKScene {
         hud.addChild(tapToStartNode)
         
         createHUD()
+        
+        // TODO: Delete this! just for testing
+        // draw orangeship
+        drawSpecialNode(ShipNode(type: .Boost))
+        
     }
     
     override func update(currentTime: NSTimeInterval) {
