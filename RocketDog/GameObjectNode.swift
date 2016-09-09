@@ -161,7 +161,10 @@ class AsteroidNode: GameObjectNode {
     
     override func collisionWithPlayer(player: SKNode) -> Bool {
 
-        // TODO: Fix background so that no black is visible when screen shakes
+        if (player as! ShipNode).type == .Boost {
+            return false
+        }
+        
         (player as! GameObjectNode).addExplosionToObject()
         self.addExplosionToObject()
         
@@ -203,6 +206,7 @@ class ShipNode: GameObjectNode {
             sprite = SKSpriteNode(imageNamed: "orangeShip")
             physicsBody = SKPhysicsBody(rectangleOfSize: sprite.size)
             physicsBody?.categoryBitMask = CollisionCategoryBitMask.PowerUp
+            physicsBody?.contactTestBitMask = CollisionCategoryBitMask.Asteroid | CollisionCategoryBitMask.BlackHole
         }
         addChild(sprite)
         height = sprite.size.height
@@ -344,6 +348,10 @@ class BlackHoleNode: GameObjectNode {
     }
     
     override func collisionWithPlayer(player: SKNode) -> Bool {
+        
+        if (player as! ShipNode).type == .Boost {
+            return false
+        }
         
         (player as! ShipNode).simulatePhysics = false // do not use accelerometer to set ship rotation
 
