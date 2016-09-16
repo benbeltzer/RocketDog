@@ -1,2 +1,2 @@
 # RocketDog
-iOS Rocket Game
+iOS Rocket Game. Created by Benjamin Beltzer
