@@ -117,11 +117,6 @@ class GameScene: SKScene {
         hud.addChild(tapToStartNode)
         
         createHUD()
-        
-        // TODO: Delete this! just for testing
-        // draw orangeship
-        drawSpecialNode(ShipNode(type: .Boost))
-        
     }
     
     override func update(currentTime: NSTimeInterval) {
@@ -188,8 +183,14 @@ class GameScene: SKScene {
         // Draw an power up at distance intervals of 1500
         if Int(player.position.y) > levelInterval * 1500 {
             levelInterval += 1
-            // TODO: instead pic random power up and draw more often !!!!!
-            drawSpecialNode(ShipNode(type: .Laser))
+
+            // draw laser ships 3/4 of time and boost 1/4 of time
+            if (random() % 4) < 3 {
+                drawSpecialNode(ShipNode(type: .Laser))
+            } else {
+                drawSpecialNode(ShipNode(type: .Boost))
+            }
+
         }
         
         // Check if we need to reload background
@@ -211,7 +212,7 @@ class GameScene: SKScene {
     
     func createLaserBar() {
         if (laserBar == nil) {
-            laserBar = SKShapeNode(path: CGPathCreateWithRoundedRect(CGRect(x: 0, y: 0, width: 50, height: 15), 5, 5, nil))
+            laserBar = SKShapeNode(path: CGPathCreateWithRoundedRect(CGRect(x: 0, y: 0, width: 100, height: 15), 5, 5, nil))
             laserBar.strokeColor = .blackColor()
             laserBar.fillColor = .redColor()
             laserBar.position = CGPoint(x: 10, y: self.size.height - 20)
@@ -228,7 +229,7 @@ class GameScene: SKScene {
     
     func shrinkLaserBar() {
         if (laserBar != nil) {
-            laserBar.xScale -= 0.02
+            laserBar.xScale -= 0.04
             if laserBar.xScale <= 0 {
                 laserBar.removeFromParent()
                 
@@ -257,7 +258,7 @@ class GameScene: SKScene {
     
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         // If already started ignore touches
-        if (player.physicsBody!.dynamic && player.type == .Normal) {
+        if (player.physicsBody!.dynamic && player.type != .Laser) {
             return
         } else if (player.type == .Laser) {
             addLaser()

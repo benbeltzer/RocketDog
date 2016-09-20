@@ -230,35 +230,32 @@ class ShipNode: GameObjectNode {
     }
     
     override func collisionWithPlayer(player: SKNode) -> Bool {
-        // Power Up ship and player collided
-
-        player.removeAllChildren()
+        // Power up ship and player collided
         
-        var sprite: SKSpriteNode!
-
-        if type == .Laser {
-            sprite = SKSpriteNode(imageNamed: "redShip")
-            player.addChild(sprite)
-            (player as! ShipNode).type = .Laser
+        if (player as! ShipNode).type != .Boost {
             
-            if (!(player as! ShipNode).hasSeenLaser) {
-                let point = CGPoint(x: (scene!.size.width / 2), y: 40)
-                let label = makeInstructionLabel("TAP TO SHOOT!", atPosition: point)
-                (scene as! GameScene).addChild(label)
-                (player as! ShipNode).hasSeenLaser = true
+            player.removeAllChildren()
+            var sprite: SKSpriteNode!
+            
+            if type == .Laser {
+                sprite = SKSpriteNode(imageNamed: "redShip")
+                player.addChild(sprite)
+                (player as! ShipNode).type = .Laser
+                
+                if (!(player as! ShipNode).hasSeenLaser) {
+                    let point = CGPoint(x: (scene!.size.width / 2), y: 40)
+                    let label = makeInstructionLabel("TAP TO SHOOT!", atPosition: point)
+                    (scene as! GameScene).addChild(label)
+                    (player as! ShipNode).hasSeenLaser = true
+                }
+            } else if type == .Boost {
+                sprite = SKSpriteNode(imageNamed: "orangeShip")
+                player.addChild(sprite)
+                
+                boostShip(player)
             }
-
-        } else {
-            // Boost Ship. Power up ship will never be normal type
-            sprite = SKSpriteNode(imageNamed: "orangeShip")
-            player.addChild(sprite)
-            (player as! ShipNode).type = .Boost
-            
-            // TODO: Call Boost Ship Method!!!
-            boostShip(player)
+            removeFromParent()
         }
-
-        removeFromParent()
         
         return false
     }
@@ -288,20 +285,30 @@ class ShipNode: GameObjectNode {
             ship.addThrust()
         }
         
+        let oldType = (player as! ShipNode).type
+        (player as! ShipNode).type = .Boost
+        
         // Make ship go fast
         if let gameScene = scene as? GameScene {
             gameScene.setLayerSpeeds(1, midgroundRate: 2.5, foregroundRate: 10, playerRate: 10)
+            let boostSound = SKAction.playSoundFileNamed("boost.wav", waitForCompletion: false)
+            gameScene.runAction(boostSound)
             
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 3 * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 4 * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
                 // After 5 seconds, slow ship down to normal rate and swap ship
                 gameScene.setLayerSpeeds()
                 player.removeAllChildren()
-                let sprite = SKSpriteNode(imageNamed: "blueShip")
+                var sprite: SKSpriteNode!
+                if oldType == .Normal {
+                    sprite = SKSpriteNode(imageNamed: "blueShip")
+                } else {
+                    sprite = SKSpriteNode(imageNamed: "redShip")
+                }                
                 player.addChild(sprite)
                 
                 // After 1 more second, make ship vulnerable again
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
-                    (player as! ShipNode).type = .Normal
+                    (player as! ShipNode).type = oldType
                 })
             })
         }
