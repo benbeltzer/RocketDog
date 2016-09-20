@@ -155,6 +155,9 @@ class GameScene: SKScene {
         
         // Paralax Effect
         if (player.physicsBody!.dynamic) {
+            if player.type != .Boost {
+                setLayerSpeeds()
+            }
             background.position.y -= backgroundSpeed
             midground.position.y -=  midgroundSpeed
             foreground.position.y -= foregroundSpeed
@@ -169,7 +172,7 @@ class GameScene: SKScene {
         
         // Check if we should add a flying asteroid
         if (player.physicsBody!.dynamic) {
-            if (random() % 150) == 0 {
+            if (Int(arc4random()) % 150) == 0 {
                 drawMovingAsteroid()
             }
         }
@@ -185,7 +188,7 @@ class GameScene: SKScene {
             levelInterval += 1
 
             // draw laser ships 3/4 of time and boost 1/4 of time
-            if (random() % 4) < 3 {
+            if (Int(arc4random()) % 4) < 3 {
                 drawSpecialNode(ShipNode(type: .Laser))
             } else {
                 drawSpecialNode(ShipNode(type: .Boost))
@@ -204,10 +207,16 @@ class GameScene: SKScene {
     }
     
     func setLayerSpeeds(backgroundRate: CGFloat = 0.2, midgroundRate: CGFloat = 0.5, foregroundRate: CGFloat = 2, playerRate: CGFloat = 2) {
-        backgroundSpeed = backgroundRate
-        midgroundSpeed =  midgroundRate
-        foregroundSpeed = foregroundRate
-        playerSpeed = playerRate
+        // 1000 ft increase in height: 10% increase in speed. Max rate is 5
+        var paralaxRate: CGFloat = 1
+        if let height = player?.position.y {
+            paralaxRate = min(1 + 0.1 * (height / 1000), 5)
+        }
+        
+        backgroundSpeed = backgroundRate * paralaxRate
+        midgroundSpeed =  midgroundRate * paralaxRate
+        foregroundSpeed = foregroundRate * paralaxRate
+        playerSpeed = playerRate * paralaxRate
     }
     
     func createLaserBar() {
@@ -379,7 +388,7 @@ class GameScene: SKScene {
         var r = 0
         
         while (currentY < maxLevelY) {
-            r = random()
+            r = Int(arc4random())
 
             // Get random xPosition between 0 and self.size.width - 30
             xPosition = (CGFloat(r) % (self.size.width - 30))
@@ -391,7 +400,7 @@ class GameScene: SKScene {
     }
     
     func drawMovingAsteroid() {
-        let r = random()
+        let r = Int(arc4random())
         let xPosition = CGFloat(r) % self.size.width
         let asteroid = createAsteroidAtPosition(CGPoint(x: xPosition, y: player.position.y + self.size.height), ofType: .Moving)
         foreground.addChild(asteroid)
@@ -432,7 +441,7 @@ class GameScene: SKScene {
     // TODO: For now pick a LaserShip, later we will choose random power up from plist
     // plist will just store a list of power up types, or use an enum in gameobjectnode
     func drawSpecialNode(node: GameObjectNode) {
-        let xPosition = (CGFloat(random()) % (self.size.width - 60)) + 30
+        let xPosition = (CGFloat(arc4random()) % (self.size.width - 60)) + 30
         let yPosition = player.position.y + self.size.height
         
         node.position = CGPoint(x: xPosition * scaleFactor, y: yPosition)
