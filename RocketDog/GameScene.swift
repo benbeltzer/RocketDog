@@ -19,6 +19,12 @@ class GameScene: SKScene {
     
     var player: ShipNode!
     
+    // Layer Speeds
+    var backgroundSpeed: CGFloat!
+    var midgroundSpeed: CGFloat!
+    var foregroundSpeed: CGFloat!
+    var playerSpeed: CGFloat!
+    
     let motionManager = CMMotionManager()
     var xAcceleration: CGFloat = 0.0 // value from accelerometer
     var rotation: CGFloat = 0.0
@@ -61,6 +67,9 @@ class GameScene: SKScene {
         scaleFactor = self.size.width / 320.0
         
         GameState.sharedInstance.score = 0
+        
+        // Paralax Effect parameters
+        setLayerSpeeds()
         
         // Setup Background
         background = createBackground(0)
@@ -151,10 +160,10 @@ class GameScene: SKScene {
         
         // Paralax Effect
         if (player.physicsBody!.dynamic) {
-            background.position.y -= 0.2
-            midground.position.y -=  0.5
-            foreground.position.y -= 2
-            player.position.y += 2
+            background.position.y -= backgroundSpeed
+            midground.position.y -=  midgroundSpeed
+            foreground.position.y -= foregroundSpeed
+            player.position.y += playerSpeed
         }
         
         // Check if we need to add more asteroids
@@ -191,6 +200,13 @@ class GameScene: SKScene {
             newBackground.zPosition = 0
             background.addChild(newBackground)
         }
+    }
+    
+    func setLayerSpeeds(backgroundRate: CGFloat = 0.2, midgroundRate: CGFloat = 0.5, foregroundRate: CGFloat = 2, playerRate: CGFloat = 2) {
+        backgroundSpeed = backgroundRate
+        midgroundSpeed =  midgroundRate
+        foregroundSpeed = foregroundRate
+        playerSpeed = playerRate
     }
     
     func createLaserBar() {

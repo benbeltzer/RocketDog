@@ -255,12 +255,7 @@ class ShipNode: GameObjectNode {
             (player as! ShipNode).type = .Boost
             
             // TODO: Call Boost Ship Method!!!
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
-                player.removeAllChildren()
-                sprite = SKSpriteNode(imageNamed: "blueShip")
-                player.addChild(sprite)
-                (player as! ShipNode).type = .Normal
-            })
+            boostShip(player)
         }
 
         removeFromParent()
@@ -286,6 +281,30 @@ class ShipNode: GameObjectNode {
         let fade = SKAction.fadeAlphaTo(0, duration: 5)
         label.runAction(fade)
         return label
+    }
+    
+    func boostShip(player: SKNode) {
+        if let ship = player as? ShipNode {
+            ship.addThrust()
+        }
+        
+        // Make ship go fast
+        if let gameScene = scene as? GameScene {
+            gameScene.setLayerSpeeds(1, midgroundRate: 2.5, foregroundRate: 10, playerRate: 10)
+            
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 3 * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
+                // After 5 seconds, slow ship down to normal rate and swap ship
+                gameScene.setLayerSpeeds()
+                player.removeAllChildren()
+                let sprite = SKSpriteNode(imageNamed: "blueShip")
+                player.addChild(sprite)
+                
+                // After 1 more second, make ship vulnerable again
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
+                    (player as! ShipNode).type = .Normal
+                })
+            })
+        }
     }
     
 }
