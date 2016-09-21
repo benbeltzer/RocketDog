@@ -39,6 +39,9 @@ class GameScene: SKScene {
     var extraPoints = 0
     var laserBar: SKShapeNode!
     
+    // Shield
+    var shieldAvailable = true
+    
     // music
     var backgroundMusic: SKAudioNode!
     
@@ -106,7 +109,6 @@ class GameScene: SKScene {
         foreground.addChild(player)
         
         // Tap to Start
-        // TODO: Change this image to something else, like Blast Off!
         tapToStartNode.name = "TAPTOSTART"
         tapToStartNode.fontSize = 30
         tapToStartNode.fontColor = SKColor.whiteColor()
@@ -492,17 +494,16 @@ class GameScene: SKScene {
 extension GameScene: SKPhysicsContactDelegate {
     
     func didBeginContact(contact: SKPhysicsContact) {
-        var updateHUD = false
 
         if (contact.bodyA.node != player && contact.bodyB.node != player) {
             
             // Collision between laser and something
             if let asteroid = contact.bodyA.node as? AsteroidNode,
                 laser = (contact.bodyB.node as? LaserNode) {
-                updateHUD = laser.collisionWithAsteroid(asteroid)
+                laser.collisionWithAsteroid(asteroid)
             } else if let asteroid = contact.bodyB.node as? AsteroidNode,
                 laser = contact.bodyA.node as? LaserNode {
-                updateHUD = laser.collisionWithAsteroid(asteroid)
+                laser.collisionWithAsteroid(asteroid)
             } else if let laser = contact.bodyA.node as? LaserNode,
                 blackHole = contact.bodyB.node as? BlackHoleNode {
                 blackHole.collisionWithLaser(laser)
@@ -518,14 +519,10 @@ extension GameScene: SKPhysicsContactDelegate {
                 if let ship = (other as? ShipNode) where ship.type == .Laser && player.type != .Boost {
                     createLaserBar()
                 }
-                updateHUD = other.collisionWithPlayer(player)
+                other.collisionWithPlayer(player)
             }
         }
-        
-        // Update the HUD if necessary
-        if updateHUD {
-            scoreLabel.text = "\(GameState.sharedInstance.score)"
-        }
+
     }
     
 }
