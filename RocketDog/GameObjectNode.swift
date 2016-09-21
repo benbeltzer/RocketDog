@@ -69,7 +69,7 @@ class GameObjectNode: SKNode {
         let shake = SKAction.sequence([move1, move2, move3, move4, move1, move5, move6, move7])
         
         for child in gameScene.children {
-            if (child.name != "BACKGROUND" && child.name != "MIDGROUND") {
+            if (child.name != "BACKGROUND" && child.name != "MIDGROUND" && child.name != "HUD") {
                 shakeNode(child, shake: shake)
             }
         }
@@ -161,7 +161,7 @@ class AsteroidNode: GameObjectNode {
     
     override func collisionWithPlayer(player: SKNode) -> Bool {
 
-        if (player as! ShipNode).type == .Boost {
+        if (player as! ShipNode).type == .Boost || (player as! ShipNode).invincible {
             return false
         }
         
@@ -183,6 +183,7 @@ class ShipNode: GameObjectNode {
     var height: CGFloat!
     var hasSeenLaser = false // determine if we should show instructions
     var simulatePhysics = true
+    var invincible = false
     
     init(type: ShipType) {
         super.init()
@@ -383,7 +384,7 @@ class BlackHoleNode: GameObjectNode {
     
     override func collisionWithPlayer(player: SKNode) -> Bool {
         
-        if (player as! ShipNode).type == .Boost {
+        if (player as! ShipNode).type == .Boost || (player as! ShipNode).invincible {
             return false
         }
         

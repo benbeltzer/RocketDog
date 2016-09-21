@@ -267,9 +267,42 @@ class GameScene: SKScene {
         shrinkLaserBar()
     }
     
+    // Protects player for 1 second
+    func useShield() {
+        shieldAvailable = false
+        player.invincible = true
+        
+        // Remove Shield Image from HUD
+        hud.enumerateChildNodesWithName("SHIELD") { (node, bool) in
+            node.removeFromParent()
+        }
+        
+        // Play sound
+        let shieldSound = SKAction.playSoundFileNamed("shield.wav", waitForCompletion: false)
+        runAction(shieldSound)
+        
+        // Add force field around ship for 1 second
+        let sprite = SKSpriteNode(imageNamed: "force_field")
+        player.addChild(sprite)
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
+            sprite.removeFromParent()
+            self.player.invincible = false
+            
+            // After 4 more seconds, recharge shield
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 4 * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
+                self.shieldAvailable = true
+                self.drawShield()
+            })
+        })
+    }
+    
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        // If already started ignore touches
-        if (player.physicsBody!.dynamic && player.type != .Laser) {
+        if (shieldAvailable && player.type == .Normal && player.physicsBody!.dynamic) {
+            useShield()
+            return
+        }
+        else if (player.physicsBody!.dynamic && player.type != .Laser) {
+            // ignore touches if not laser and not using shield
             return
         } else if (player.type == .Laser) {
             addLaser()
@@ -367,14 +400,24 @@ class GameScene: SKScene {
     
     func createHUD() {
 
+        // Score Label
         scoreLabel = SKLabelNode(fontNamed: "Futura-Medium")
         scoreLabel.fontSize = 30
         scoreLabel.fontColor = SKColor.whiteColor()
         scoreLabel.position = CGPoint(x: self.size.width-20, y: self.size.height-40)
         scoreLabel.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.Right
-        
         scoreLabel.text = "0"
         hud.addChild(scoreLabel)
+        
+        // Shield
+        drawShield()
+    }
+    
+    func drawShield() {
+        let sprite = SKSpriteNode(imageNamed: "shield")
+        sprite.position = CGPoint(x: 25, y: 35)
+        sprite.name = "SHIELD"
+        hud.addChild(sprite)
     }
     
     // For creating stationary asteroids
