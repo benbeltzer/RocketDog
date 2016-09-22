@@ -53,21 +53,11 @@ class EndGameScene: SKScene {
         highScoreLabel.zPosition = 1
         addChild(highScoreLabel)
         
-        // Name (later will use for scoreboard)
-        let nameLabel = SKLabelNode(fontNamed: "Futura-Medium")
-        nameLabel.fontSize = 20
-        nameLabel.fontColor = SKColor.whiteColor()
-        nameLabel.position = CGPoint(x: size.width / 2, y: 150)
-        nameLabel.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.Center
-        nameLabel.text = "YOUR NAME: brb1494"
-        nameLabel.zPosition = 1
-        addChild(nameLabel)
-        
         // Try again
         let tryAgainLabel = SKLabelNode(fontNamed: "Futura-Medium")
         tryAgainLabel.fontSize = 20
         tryAgainLabel.fontColor = SKColor.whiteColor()
-        tryAgainLabel.position = CGPoint(x: size.width / 2, y: 50)
+        tryAgainLabel.position = CGPoint(x: size.width / 2, y: 100)
         tryAgainLabel.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.Center
         tryAgainLabel.text = "TAP TO TRY AGAIN"
         tryAgainLabel.zPosition = 1
