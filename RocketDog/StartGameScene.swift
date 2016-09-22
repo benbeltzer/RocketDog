@@ -38,13 +38,15 @@ class StartGameScene: SKScene {
         let gameScene = GameScene(size: size)
         drawAsteroids(gameScene)
         
+        // Add Flying Ships
+        drawShips()
+        
         // Title Label
         let topTitleLabel = SKLabelNode(fontNamed: "Futura-Medium")
         topTitleLabel.fontSize = 80
         topTitleLabel.fontColor = SKColor.whiteColor()
-        topTitleLabel.position = CGPoint(x: size.width / 3 + 30, y: size.height - 125)
+        topTitleLabel.position = CGPoint(x: size.width / 2, y: size.height/2 + 37)
         topTitleLabel.horizontalAlignmentMode = .Center
-        topTitleLabel.zRotation = CGFloat(M_PI / 6)
         topTitleLabel.text = "BLAST"
         topTitleLabel.zPosition = 1
         topTitleLabel.physicsBody?.dynamic = true
@@ -53,9 +55,8 @@ class StartGameScene: SKScene {
         let bottomTitleLabel = SKLabelNode(fontNamed: "Futura-Medium")
         bottomTitleLabel.fontSize = 80
         bottomTitleLabel.fontColor = SKColor.whiteColor()
-        bottomTitleLabel.position = CGPoint(x: size.width / 3 + 60, y: size.height - 200)
+        bottomTitleLabel.position = CGPoint(x: size.width / 2, y: size.height/2 - 37)
         bottomTitleLabel.horizontalAlignmentMode = .Center
-        bottomTitleLabel.zRotation = CGFloat(M_PI / 6)
         bottomTitleLabel.text = "OFF!"
         bottomTitleLabel.zPosition = 1
         bottomTitleLabel.physicsBody?.dynamic = true
@@ -65,9 +66,9 @@ class StartGameScene: SKScene {
         
         // Tap To Start Label
         let tapToStartLabel = SKLabelNode(fontNamed: "Futura-Medium")
-        tapToStartLabel.fontSize = 40
+        tapToStartLabel.fontSize = 30
         tapToStartLabel.fontColor = SKColor.whiteColor()
-        tapToStartLabel.position = CGPoint(x: size.width / 2, y: size.height / 2 - 100)
+        tapToStartLabel.position = CGPoint(x: size.width / 2, y: 75)
         tapToStartLabel.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.Center
         tapToStartLabel.text = "TAP TO START"
         tapToStartLabel.zPosition = 1
@@ -153,5 +154,36 @@ class StartGameScene: SKScene {
         asteroid.addChild(fireEmitter)
         fireEmitter.position = CGPoint(x: fireEmitter.position.x, y: fireEmitter.position.y - 10)
         fireEmitter.zPosition = asteroid.zPosition + 1
+    }
+    
+    func drawShips() {
+        let r = Int(arc4random())
+        let yPosition = CGFloat(r) % (self.size.height - 200)
+        let xPosition = CGFloat(-50)
+
+        let type = ShipType(rawValue: r % 3)!
+        let ship = ShipNode(type: type)
+        ship.position = CGPoint(x: xPosition, y: yPosition)
+        ship.physicsBody?.dynamic = true
+        ship.zPosition = 5
+        addChild(ship)
+        moveShip(ship)
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(1.5 * Double(NSEC_PER_SEC))), dispatch_get_main_queue(), {
+            // If the current scene is still present, keep drawing
+            if self.view != nil {
+                self.drawShips()
+            }
+        })
+    }
+    
+    func moveShip(ship: ShipNode) {
+        let dx = 50
+        let dy = 50
+        
+        ship.zRotation = atan2(CGFloat(dy), CGFloat(dx)) - CGFloat(M_PI_2)
+        ship.physicsBody?.applyImpulse(CGVector(dx: dx, dy: dy))
+        ship.physicsBody?.affectedByGravity = false
+        ship.addThrust()
     }
 }
