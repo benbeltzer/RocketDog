@@ -306,10 +306,12 @@ class ShipNode: GameObjectNode {
                     sprite = SKSpriteNode(imageNamed: "redShip")
                 }                
                 player.addChild(sprite)
+                (player as! ShipNode).type = oldType
+                (player as! ShipNode).invincible = true
                 
                 // After 1 more second, make ship vulnerable again
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
-                    (player as! ShipNode).type = oldType
+                    (player as! ShipNode).invincible = false
                 })
             })
         }

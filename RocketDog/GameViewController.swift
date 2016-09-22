@@ -20,9 +20,8 @@ class GameViewController: UIViewController {
         /* Sprite Kit applies additional optimizations to improve rendering performance */
         skView.ignoresSiblingOrder = true
         
-        let scene = GameScene(size: skView.bounds.size)
+        let scene = StartGameScene(size: skView.bounds.size)
         scene.scaleMode = .AspectFit
-        
         skView.presentScene(scene)
     }
 

@@ -15,8 +15,6 @@ class EndGameScene: SKScene {
         super.init(coder: aDecoder)
     }
     
-    
-    // TODO: Completely change end scene. This is shit
     override init(size: CGSize) {
         super.init(size: size)
         
