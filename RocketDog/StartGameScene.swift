@@ -39,20 +39,35 @@ class StartGameScene: SKScene {
         drawAsteroids(gameScene)
         
         // Title Label
-        let titleLabel = SKLabelNode(fontNamed: "Futura-Medium")
-        titleLabel.fontSize = 40
-        titleLabel.fontColor = SKColor.whiteColor()
-        titleLabel.position = CGPoint(x: size.width / 2, y: 350)
-        titleLabel.horizontalAlignmentMode = .Center
-        titleLabel.text = "BLAST OFF!"
-        titleLabel.zPosition = 1
-        addChild(titleLabel)
+        let topTitleLabel = SKLabelNode(fontNamed: "Futura-Medium")
+        topTitleLabel.fontSize = 80
+        topTitleLabel.fontColor = SKColor.whiteColor()
+        topTitleLabel.position = CGPoint(x: size.width / 3 + 30, y: size.height - 125)
+        topTitleLabel.horizontalAlignmentMode = .Center
+        topTitleLabel.zRotation = CGFloat(M_PI / 6)
+        topTitleLabel.text = "BLAST"
+        topTitleLabel.zPosition = 1
+        topTitleLabel.physicsBody?.dynamic = true
+        addChild(topTitleLabel)
+        
+        let bottomTitleLabel = SKLabelNode(fontNamed: "Futura-Medium")
+        bottomTitleLabel.fontSize = 80
+        bottomTitleLabel.fontColor = SKColor.whiteColor()
+        bottomTitleLabel.position = CGPoint(x: size.width / 3 + 60, y: size.height - 200)
+        bottomTitleLabel.horizontalAlignmentMode = .Center
+        bottomTitleLabel.zRotation = CGFloat(M_PI / 6)
+        bottomTitleLabel.text = "OFF!"
+        bottomTitleLabel.zPosition = 1
+        bottomTitleLabel.physicsBody?.dynamic = true
+        addChild(bottomTitleLabel)
+        
+        bounceTitle(topTitleLabel, bottomLabel: bottomTitleLabel, moveSequence: nil)
         
         // Tap To Start Label
         let tapToStartLabel = SKLabelNode(fontNamed: "Futura-Medium")
-        tapToStartLabel.fontSize = 20
+        tapToStartLabel.fontSize = 40
         tapToStartLabel.fontColor = SKColor.whiteColor()
-        tapToStartLabel.position = CGPoint(x: size.width / 2, y: 100)
+        tapToStartLabel.position = CGPoint(x: size.width / 2, y: size.height / 2 - 100)
         tapToStartLabel.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.Center
         tapToStartLabel.text = "TAP TO START"
         tapToStartLabel.zPosition = 1
@@ -64,6 +79,29 @@ class StartGameScene: SKScene {
         let reveal = SKTransition.fadeWithDuration(0.5)
         let gameScene = GameScene(size: self.size)
         self.view!.presentScene(gameScene, transition: reveal)
+    }
+    
+    func bounceTitle(topLabel: SKLabelNode, bottomLabel: SKLabelNode, moveSequence: SKAction?) {
+        
+        var move: SKAction!
+        if moveSequence == nil {
+            let moveDown = SKAction.moveBy(CGVectorMake(0, -20), duration: 0.35)
+            let moveUp = SKAction.moveBy(CGVectorMake(0, 20), duration: 0.35)
+            move = SKAction.sequence([moveDown, moveUp])
+        } else {
+            move = moveSequence!
+        }
+        
+        topLabel.runAction(move)
+        bottomLabel.runAction(move)
+
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(Double(NSEC_PER_SEC) * 0.7)), dispatch_get_main_queue(), {
+            // If the current scene is still present, keep drawing
+            if self.view != nil {
+                self.bounceTitle(topLabel, bottomLabel: bottomLabel, moveSequence: move)
+            }
+        })
+        
     }
     
     func createBackground() -> SKNode {
