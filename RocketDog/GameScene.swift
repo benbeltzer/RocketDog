@@ -49,6 +49,7 @@ class GameScene: SKScene {
     // For iPhone 6
     var scaleFactor: CGFloat!
     
+    let tapToUseShieldNode = SKLabelNode(fontNamed: "Futura-Medium")
     let tapToStartNode = SKLabelNode(fontNamed: "Futura-Medium")
     
     var scoreLabel: SKLabelNode!
@@ -108,6 +109,16 @@ class GameScene: SKScene {
         player.name = "PLAYER"
         player.zPosition = 3
         foreground.addChild(player)
+        
+        // Tap to Use Shield
+        tapToUseShieldNode.name = "TAPTOUSESHIELD"
+        tapToUseShieldNode.fontSize = 15
+        tapToUseShieldNode.fontColor = SKColor.whiteColor()
+        tapToUseShieldNode.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.Right
+        tapToUseShieldNode.text = "TAP TO USE SHIELD AT ANY TIME"
+        tapToUseShieldNode.position = CGPoint(x: self.size.width - 20, y: 30)
+        tapToUseShieldNode.zPosition = player.zPosition + 1
+        hud.addChild(tapToUseShieldNode)
         
         // Tap to Start
         tapToStartNode.name = "TAPTOSTART"
@@ -272,6 +283,7 @@ class GameScene: SKScene {
     
     // Protects player for 1 second
     func useShield() {
+        tapToUseShieldNode.removeFromParent()
         shieldAvailable = false
         player.invincible = true
         
