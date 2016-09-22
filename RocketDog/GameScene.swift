@@ -24,6 +24,7 @@ class GameScene: SKScene {
     var midgroundSpeed: CGFloat!
     var foregroundSpeed: CGFloat!
     var playerSpeed: CGFloat!
+    var paralaxRate: CGFloat = 1
     
     let motionManager = CMMotionManager()
     var xAcceleration: CGFloat = 0.0 // value from accelerometer
@@ -209,10 +210,12 @@ class GameScene: SKScene {
     }
     
     func setLayerSpeeds(backgroundRate: CGFloat = 0.2, midgroundRate: CGFloat = 0.5, foregroundRate: CGFloat = 2, playerRate: CGFloat = 2) {
-        // 1000 ft increase in height: 10% increase in speed. Max rate is 5
-        var paralaxRate: CGFloat = 1
+        // 1000 ft increase in height: 10% increase in speed. Max rate is 3
         if let height = player?.position.y {
-            paralaxRate = min(1 + 0.1 * (height / 1000), 5)
+            paralaxRate = min(1 + 0.05 * (height / 1000), 4)
+            if paralaxRate > 2 {
+                paralaxRate = 2 + (((paralaxRate - 2) % 2.01) * 0.5)
+            }
         }
         
         backgroundSpeed = backgroundRate * paralaxRate
@@ -263,7 +266,7 @@ class GameScene: SKScene {
         laser.physicsBody?.velocity.dx = (player.physicsBody?.velocity.dx)! * 2
         laser.zRotation = player.zRotation
         foreground.addChild(laser)
-        laser.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 50))
+        laser.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 50 * paralaxRate))
         shrinkLaserBar()
     }
     
