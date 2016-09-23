@@ -283,7 +283,6 @@ class GameScene: SKScene {
     
     // Protects player for 1 second
     func useShield() {
-        tapToUseShieldNode.removeFromParent()
         shieldAvailable = false
         player.invincible = true
         
@@ -326,6 +325,7 @@ class GameScene: SKScene {
     
         initMotionManager()
         tapToStartNode.removeFromParent()
+        tapToUseShieldNode.removeFromParent()
         
         if let musicURL = NSBundle.mainBundle().URLForResource("rocket_thrust", withExtension: "wav") {
             backgroundMusic = SKAudioNode(URL: musicURL)
